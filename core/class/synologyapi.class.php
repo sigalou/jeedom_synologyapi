@@ -75,10 +75,66 @@ class synologyapi extends eqLogic {
 
 
     /*     * *********************Méthodes d'instance************************* */
+
+//Ajouté par l'installateur, c'est un cron exécuté toutes les minutes
+public static function update() {
+		
+		foreach (self::byType('synologyapi') as $synologyapi) {
+
+			//log::add('synologyapi','debug','Lancement update de '.$synologyapi->getName().' ('.$synologyapi->getConfiguration('device').')');
+			$autorefresh = $synologyapi->getConfiguration('autorefresh');
+			$synologyapi->setConfiguration('dernierLancement',date("d.m.Y")." ".date("H:i:s")); // PRECON c'est pour signaler que le CRON va etre sauvegarder
+			//ESSAI
+			//$synologyapi->setConfiguration("synologyapiAction", 'CRON '.date("d.m.Y")." ".date("H:i:s"));
+			
+			if ($synologyapi->getIsEnable() == 1 && $autorefresh != '') {
+				try {
+					$c = new Cron\CronExpression($autorefresh, new Cron\FieldFactory);
+					if ($c->isDue()) {
+						try {
+							if 		($synologyapi->getConfiguration('devicetype') == "2") $nomSynology = config::byKey('Syno2_name','synologyapi');
+							elseif	($synologyapi->getConfiguration('devicetype') == "3") $nomSynology = config::byKey('Syno3_name','synologyapi');
+							else 														  $nomSynology = config::byKey('Syno1_name','synologyapi');
+							//$synologyapi->setConfiguration('boucleEnCours', "CRON");
+							//$_boucleEnCours="CRON";
+							log::add('synologyapi','debug','-----------------------------------------------------------------');
+							log::add('synologyapi','debug',"Actualisation des données de l'API **".$synologyapi->getName().'** sur '.$nomSynology);
+							log::add('synologyapi','debug','-----------------------------------------------------------------');
+							$synologyapi->lancerControle($synologyapi);
+							//log::add('synologyapi','debug','fin cron-----------------------------------------------------------------');
+						} catch (Exception $exc) {
+							log::add('synologyapi', 'error', __('Erreur pour ', __FILE__) . $synologyapi->getHumanName() . ' : ' . $exc->getMessage());
+						}
+						$synologyapi->save();
+					}
+				} catch (Exception $exc) {
+					log::add('synologyapi', 'error', __('Expression cron non valide pour ', __FILE__) . $synologyapi->getHumanName() . ' : ' . $autorefresh);
+				}
+			}
+		}
+	}
+
+	public function lancerControle($synologyapi) {
+		
+		//log::add('synologyapi', 'debug', "* Avant de lancer le contrôle on lance les actions d'avant contrôle (s'il y en a).");
+		
+		
+		//log::add('synologyapi', 'debug', '* Maintenant, on lance les contrôles :');
+		
+		//set_boucleEnCours("7888885613");
+		foreach ($synologyapi->getCmd('info') as $cmd) {
+					log::add('synologyapi', 'debug', '[Mise à jour] Lancer le contrôle ** '.$cmd->getName()." **");
+					//2 lignes inutiles car le controle se fait déja au moment de preSave
+					//$resultat=$cmd->faireTestExpression($cmd->getConfiguration('controle'));
+					//$cmd->setConfiguration('resultat', $resultat);
+					//$cmd->save();
+					//log::add('synologyapi', 'debug', '[>>>>FIN>>>>Contrôle] Lancer le contrôle ** '.$cmd->getName()." **");
+				}
+		
+	}
     
  // Fonction exécutée automatiquement avant la création de l'équipement 
     public function preInsert() {
-        
     }
 
  // Fonction exécutée automatiquement après la création de l'équipement 

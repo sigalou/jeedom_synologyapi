@@ -18,19 +18,42 @@
 
 require_once dirname(__FILE__) . '/../../../core/php/core.inc.php';
 
+
 // Fonction exécutée automatiquement après l'installation du plugin
-  function synologyapi_install() {
-
-  }
-
+function synologyapi_install() {
+    	$cron = cron::byClassAndFunction('synologyapi', 'update');
+	if (!is_object($cron)) {
+		$cron = new cron();
+		$cron->setClass('synologyapi');
+		$cron->setFunction('update');
+		$cron->setEnable(1);
+		$cron->setDeamon(0);
+		$cron->setSchedule('* * * * *');
+		$cron->setTimeout(30);
+		$cron->save();
+	}
+}
 // Fonction exécutée automatiquement après la mise à jour du plugin
-  function synologyapi_update() {
-
-  }
+function synologyapi_update() {
+    	$cron = cron::byClassAndFunction('synologyapi', 'update');
+	if (!is_object($cron)) {
+		$cron = new cron();
+	}
+	$cron->setClass('synologyapi');
+	$cron->setFunction('update');
+	$cron->setEnable(1);
+	$cron->setDeamon(0);
+	$cron->setSchedule('* * * * *');
+	$cron->setTimeout(30);
+	$cron->save();
+	$cron->stop();
+}
 
 // Fonction exécutée automatiquement après la suppression du plugin
-  function synologyapi_remove() {
-
-  }
-
+function synologyapi_remove() {
+   	$cron = cron::byClassAndFunction('synologyapi', 'update');
+	if (is_object($cron)) {
+		$cron->remove();
+	} 
+}
 ?>
