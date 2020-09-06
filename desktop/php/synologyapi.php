@@ -18,15 +18,15 @@ $eqLogics = eqLogic::byType($plugin->getId());
     </div>
 	
       <div class="cursor eqLogicAction logoSecondary" data-action="gotoPluginConf">
-      <i class="fas fa-wrench"></i>
+      <i class="fas fa-wrench" style="color:#221916"></i>
     <br>
-    <span>{{Configuration}}</span>
+    <span style="color:#221916">{{Configuration}}</span>
   </div>
   </div>
   
 <!-- -------------- Premier SYNO ---------------->  
 <input class="form-control" placeholder="{{Rechercher}}" id="in_searchEqlogic" />
-<legend><i class="fas fa-table"></i> {{API de <?php echo config::byKey('Syno1_name','synologyapi')?>}}</legend>
+<legend style="color:#221916"><i class="fas fa-cogs"></i> {{API de <?php echo config::byKey('Syno1_name','synologyapi')?>}}</legend>
 <div class="eqLogicThumbnailContainer">
     <?php
 foreach ($eqLogics as $eqLogic) {
@@ -35,7 +35,7 @@ foreach ($eqLogics as $eqLogic) {
 		echo '<div class="eqLogicDisplayCard cursor '.$opacity.'" data-eqLogic_id="' . $eqLogic->getId() . '">';
 		echo '<img src="' . $plugin->getPathImgIcon() . '"/>';
 		echo '<br>';
-		echo '<span class="name">' . $eqLogic->getHumanName(true, true) . '</span>';
+		echo '<span class="name" style="color:#221916">' . $eqLogic->getHumanName(true, true) . '</span>';
 		echo '</div>';
 		}
 }
@@ -45,7 +45,7 @@ echo "</div>";
 
 	if (config::byKey('Syno2_name','synologyapi')!="") {
 	?>
-	<legend><i class="fas fa-table"></i> {{API de <?php echo config::byKey('Syno2_name','synologyapi')?>}}</legend>
+	<legend style="color:#221916"><i class="fas fa-cogs"></i> {{API de <?php echo config::byKey('Syno2_name','synologyapi')?>}}</legend>
 	<div class="eqLogicThumbnailContainer">
 		<?php
 	foreach ($eqLogics as $eqLogic) {
@@ -54,7 +54,7 @@ echo "</div>";
 			echo '<div class="eqLogicDisplayCard cursor '.$opacity.'" data-eqLogic_id="' . $eqLogic->getId() . '">';
 			echo '<img src="' . $plugin->getPathImgIcon() . '"/>';
 			echo '<br>';
-			echo '<span class="name">' . $eqLogic->getHumanName(true, true) . '</span>';
+			echo '<span class="name" style="color:#221916">' . $eqLogic->getHumanName(true, true) . '</span>';
 			echo '</div>';
 			}
 	}
@@ -65,7 +65,7 @@ echo "</div>";
 
 	if (config::byKey('Syno3_name','synologyapi')!="") {
 	?>
-	<legend><i class="fas fa-table"></i> {{API de <?php echo config::byKey('Syno3_name','synologyapi')?>}}</legend>
+	<legend style="color:#221916"><i class="fas fa-cogs"></i> {{API de <?php echo config::byKey('Syno3_name','synologyapi')?>}}</legend>
 	<div class="eqLogicThumbnailContainer">
 		<?php
 	foreach ($eqLogics as $eqLogic) {
@@ -74,7 +74,7 @@ echo "</div>";
 			echo '<div class="eqLogicDisplayCard cursor '.$opacity.'" data-eqLogic_id="' . $eqLogic->getId() . '">';
 			echo '<img src="' . $plugin->getPathImgIcon() . '"/>';
 			echo '<br>';
-			echo '<span class="name">' . $eqLogic->getHumanName(true, true) . '</span>';
+			echo '<span class="name" style="color:#221916" >' . $eqLogic->getHumanName(true, true) . '</span>';
 			echo '</div>';
 			}
 	}
@@ -100,6 +100,7 @@ echo "</div>";
       <br/>
     <form class="form-horizontal">
         <fieldset>
+	<br><legend><i class="fas fa-cogs" style="font-size : 2em;color:#221916;"></i> <span style="color:#221916">{{Identification de l'API à utiliser}}</span></legend>
             <div class="form-group">
                 <label class="col-sm-3 control-label">{{Nom de l'API personnalisé}}</label>
                 <div class="col-sm-3">
@@ -155,6 +156,33 @@ foreach (jeeObject::all() as $object) {
 			<label class="checkbox-inline"><input type="checkbox" class="eqLogicAttr" data-l1key="isVisible" checked/>{{Visible}}</label>
 		</div>
 	</div>
+
+
+<br><legend><i class="far fa-clock" style="font-size : 2em;color:#221916;"></i> <span style="color:#221916">{{Actualisation périodique des données}}</span></legend>
+
+	<br><br>
+	
+			<div class="form-group">
+			<label class="col-xs-3 control-label">{{Auto-actualisation (cron)}}</label>
+				<div class="col-xs-2">
+					<div class="input-group">
+					<input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="autorefresh" placeholder="{{Auto-actualisation (cron)}}"/>
+					<span class="input-group-btn">
+					<a class="btn btn-success btn-sm " id="bt_cronGenerator" ><i class="fas fa-question-circle"></i></a>
+					</span>
+					</div>
+				</div>
+			</div>
+			
+			<div class="form-group">
+			<label class="col-xs-3 control-label">{{Dernier lancement}}</label>
+				<div class="col-xs-3">
+					<input type="text" disabled class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="dernierLancement">
+
+				</div>
+			</div>	
+
+
 
 </fieldset>
 </form>
