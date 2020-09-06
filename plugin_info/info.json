@@ -1,0 +1,20 @@
+{
+	"id" : "synologyapi",
+	"name" : "Synology API",
+	"description" : "Interface avec les NAS ou Routeurs Synology",
+	"licence" : "AGPL",
+	"author" : "Sigalou",
+	"require" : "3.2",
+	"category" : "monitoring",
+	"hasDependency" : false,
+	"hasOwnDeamon" : false,
+	"maxDependancyInstallTime" : 0,
+	"changelog" : "https://jeedom.github.io/plugin-synologyapi/#language#/changelog",
+	"documentation" : "https://jeedom.github.io/plugin-synologyapi/#language#/",
+	"link" : {
+		"forum":"Lien vers le forum",
+		"video" : "Lien vers une video"
+	},
+	"language" : ["fr_FR","en_US","de_DE","sp_SP"],
+	"compatibility" : ["miniplus","smart","rpi","docker","diy","mobile","v4"]
+}
