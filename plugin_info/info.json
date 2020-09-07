@@ -9,8 +9,8 @@
 	"hasDependency" : false,
 	"hasOwnDeamon" : false,
 	"maxDependancyInstallTime" : 0,
-	"changelog" : "https://jeedom.github.io/plugin-synologyapi/#language#/changelog",
-	"documentation" : "https://jeedom.github.io/plugin-synologyapi/#language#/",
+	"changelog" : "http://jeedom.sigalou-domotique.fr/plugin-synology-api-changelog-todolist",
+	"documentation" : "http://jeedom.sigalou-domotique.fr/plugin-synology-api-documentation",
 	"link" : {
 		"forum":"Lien vers le forum",
 		"video" : "Lien vers une video"

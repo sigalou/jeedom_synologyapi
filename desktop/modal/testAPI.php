@@ -28,107 +28,24 @@ function getURI(){
     }
     return $adresse;
 }
-$parametresAPI=getURI();
+		$parametresAPI=getURI();
+		$sid=synologyapi::vaChercherSID($idsynology);
 
-if ($idsynology == "2") {
-	$server = config::byKey('Syno2_server','synologyapi');
-	$login = config::byKey('Syno2_login','synologyapi');
-	$pass = config::byKey('Syno2_password','synologyapi');
-	$nomSynology = config::byKey('Syno2_name','synologyapi');
-	}
-elseif ($idsynology == "3") {
-	$server = config::byKey('Syno3_server','synologyapi');
-	$login = config::byKey('Syno3_login','synologyapi');
-	$pass = config::byKey('Syno3_password','synologyapi');
-	$nomSynology = config::byKey('Syno3_name','synologyapi');
-	}
-else {
-	$server = config::byKey('Syno1_server','synologyapi');
-	$login = config::byKey('Syno1_login','synologyapi');
-	$pass = config::byKey('Syno1_password','synologyapi');
-	$nomSynology = config::byKey('Syno1_name','synologyapi');
-	}
-
-//echo "<b>API demandée</b> : ".str_replace("SYNO.", "", $API)." <b>sur</b> ".$nomSynology; 
-//echo "<br><b>Paramètres</b> : ".str_replace("v=d&plugin=synologyapi&modal=testAPI&", "", str_replace("SYNO.", "", $parametresAPI))."<hr>"; 
-
-
-
-//Define ssl arguments
-$arrContextOptions=array(
-    "ssl"=>array(
-        "verify_peer"=>false,
-        "verify_peer_name"=>false,
-    ),
-);
-
-//Get SYNO.API.Auth Path (recommended by Synology for further update) and maxVersion
-// https://192.168.0.1:1976/webapi/query.cgi?api=SYNO.API.Info&version=1&method=query&query=SYNO.API.Auth
-$json = file_get_contents($server.'/webapi/query.cgi?api=SYNO.API.Info&version=1&method=query&query=SYNO.API.Auth', false, stream_context_create($arrContextOptions));
-
-$obj = json_decode($json);
-$path = $obj->data->{'SYNO.API.Auth'}->path;
-$vAuth = $obj->data->{'SYNO.API.Auth'}->maxVersion;
-//https://192.168.0.4:1975/webapi/auth.cgi?api=SYNO.API.Auth&method=Login&version=2&account=admin&passwd=christel
-
-$json_login = file_get_contents($server.'/webapi/'.$path.'?api=SYNO.API.Auth&version='.$vAuth.'&method=login&account='.$login.'&passwd='.$pass.'&format=sid', false, stream_context_create($arrContextOptions));
-$obj_login = json_decode($json_login);
-//echo $server.'/webapi/'.$path.'?api=SYNO.API.Auth&version='.$vAuth.'&method=login&account='.$login.'&passwd='.$pass.'&format=sid';
-
-if($obj_login->success != "true"){	echo "Login FAILED core";exit();}
-	$sid = $obj_login->data->sid;
-  // echo "<br>Login SUCCESS";
-   
   // recupereDonneesJson ($sid,"SYNO.Core.System.Utilization","get",$server,$arrContextOptions);
   // recupereDonneesJson ($sid,"SYNO.Core.System","info",$server,$arrContextOptions);
  //  recupereDonneesJson ($sid,"SYNO.Core.System","info&type=network",$server,$arrContextOptions);
    //recupereDonneesJson ($sid,"SYNO.Core.System","info&type=storage",$server,$arrContextOptions);
   // recupereDonneesJson ($sid,"SYNO.Core.SyslogClient.Log","list&logtype=ftp,filestation,webdav,cifs,tftp",$server,$arrContextOptions);
   //recupereDonneesJson ($sid,"SYNO.Core.CurrentConnection","list&start=0&limit=50&sort_by=%22time%22&sort_direction=%22DESC%22&offset=0&action=%22enum%22",$server,$arrContextOptions);
-	recupereDonneesJson ($sid,$API,$parametresAPI,$parameters,$server,$arrContextOptions,$idsynology);
   
-function recupereDonneesJson ($sid,$API,$parametresAPI,$parameters,$server,$arrContextOptions,$idsynology)
-{
-// Le codage MD5 permet d'enregistré l'empreinte de cette requete, cela est nécessaire car certains API ont des paramètres particuliers, nota : le N° du syno est intégré
-$md5=md5(str_replace("?v=d&plugin=synologyapi&modal=testAPI&api=", "", str_replace("SYNO.", "", $parametresAPI)));
-//echo "<br><b>MD5</b> : ".$md5."<hr>"; 
+  
+echo "<br>API : ".$API; 
+echo "<br>parametresAPI : ".$parametresAPI; 
+echo "<br>parameters : ".$parameters; 
 
-	//authentification successful
-	$RequeteaEnvoyer=$server.'/webapi/query.cgi?api=SYNO.API.Info&method=Query&version=1&query='.$API;
-	//echo "<br>".$RequeteaEnvoyer;
-	$json_core = file_get_contents($RequeteaEnvoyer, false, stream_context_create($arrContextOptions));
-	$obj_core = json_decode($json_core);
-	$path_core = $obj_core->data->{$API}->path;	
-	$vCore = $obj_core->data->{$API}->maxVersion;	
-
-	// DEV: LINK FOR LIVE CPU MEMORY AND NETWORK DATA INFO
-	//echo '<p>Login SUCCESS! : sid = '.$sid.'</p>';
-	//echo '<p>success 2: api path = '.$path_core.'</p>';
-	// https://trionix.homeftp.net:5555/webapi/_______________________________________________________entry.cgi?api=SYNO.Core.System.Utilization&method=get&version=1&type=current&resource=cpu	
-
-	//echo $server.'/webapi/'.$path_core.'?api=SYNO.Core.System.Utilization&version='.$vCore.'&method=get&type=current&_sid='.$sid;
-
-	 
-	//json of SYNO.Core.System.Utilization (cpu, mem, network etc)
-	$RequeteaEnvoyer=$server.'/webapi/'.$path_core.$parametresAPI.'&version='.$vCore.'&_sid='.$sid.$parameters;
-	//echo "<br>".$RequeteaEnvoyer;
-	//echo "<br>";
-	$json_coreData = file_get_contents($RequeteaEnvoyer, false, stream_context_create($arrContextOptions));
-	$obj_coreData = json_decode($json_coreData, true);
-	//echo "<br>avant boucke";
-	//echo $obj_coreData;
-	//echo $json_coreData;
-
-	//$array1 = array("color" => "red", 2, 4);
-	//$array2 = array("a", "b", "color" => "green", "shape" => "trapezoid", 4);
-	//$result = array_merge($array1, $array2);
-
-	$inforetour=traiteDonneesJson ($API,$obj_coreData,$idsynology, $md5, $parametresAPI);
-	
-	
-return $CodeError;
-
-}	
+  
+		$obj_Data=synologyapi::recupereDonneesJson ($sid, $API, $parametresAPI, $parameters, $idsynology);
+		$inforetour=traiteDonneesJson ($API, $obj_Data, $idsynology, $parametresAPI);
 
 ?>
 <script>
@@ -177,12 +94,15 @@ function actionCaseCocher(laCase, API) {
 };</script>
 <?php
 
-function traiteDonneesJson ($API,$obj_coreData,$idsynology, $md5, $parametresAPI)
+function traiteDonneesJson ($API,$obj_coreData,$idsynology, $parametresAPI)
 {
 
 //On va tester si l'API a renvoyé une erreur (xx enregistrements) ou si ça a fonctionné
 //echo "success:".$obj_coreData['success'];
 //echo "<br>valeur:".json_encode($obj_coreData);
+
+	// Le codage MD5 permet d'enregistré l'empreinte de cette requete, cela est nécessaire car certains API ont des paramètres particuliers, nota : le N° du syno est intégré
+	$md5=md5(str_replace("?v=d&plugin=synologyapi&modal=testAPI&api=", "", str_replace("SYNO.", "", $parametresAPI)));
 
 if ($obj_coreData['success']== true) {
 

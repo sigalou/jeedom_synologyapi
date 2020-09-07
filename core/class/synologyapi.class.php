@@ -98,7 +98,7 @@ public static function update() {
 							//$synologyapi->setConfiguration('boucleEnCours', "CRON");
 							//$_boucleEnCours="CRON";
 							log::add('synologyapi','debug','-----------------------------------------------------------------');
-							log::add('synologyapi','debug',"Actualisation des données de l'API **".$synologyapi->getName().'** sur '.$nomSynology);
+							log::add('synologyapi','debug',"Actualisation des données de l'API ".$synologyapi->getName().' ('.$synologyapi->getConfiguration('device').') sur '.$nomSynology);
 							log::add('synologyapi','debug','-----------------------------------------------------------------');
 							$synologyapi->lancerControle($synologyapi);
 							//log::add('synologyapi','debug','fin cron-----------------------------------------------------------------');
@@ -116,14 +116,19 @@ public static function update() {
 
 	public function lancerControle($synologyapi) {
 		
-		//log::add('synologyapi', 'debug', "* Avant de lancer le contrôle on lance les actions d'avant contrôle (s'il y en a).");
-		
-		
-		//log::add('synologyapi', 'debug', '* Maintenant, on lance les contrôles :');
-		
-		//set_boucleEnCours("7888885613");
+		$requeteaEnvoyer=$synologyapi->getConfiguration('urlAPI');
+		$requeteaEnvoyer=str_replace("amp;", "", $requeteaEnvoyer);//rustine toujours ce souci de amp;
+
+		log::add('synologyapi', 'debug', "Il faut lancer ".$requeteaEnvoyer);
+		$sid=self::vaChercherSID($synologyapi->getConfiguration('devicetype'));
+		//log::add('synologyapi', 'debug', 'OK '.$sid);
+
+		$obj_Data=self::recupereDonneesJson ($sid, "SYNO.".$synologyapi->getConfiguration('device'), $requeteaEnvoyer, "", $idsynology);
+		//echo "résultat :".json_encode($obj_Data);
+		log::add('synologyapi', 'debug', "résultat :".json_encode($obj_Data));
+
 		foreach ($synologyapi->getCmd('info') as $cmd) {
-					log::add('synologyapi', 'debug', '[Mise à jour] Lancer le contrôle ** '.$cmd->getName()." **");
+					//log::add('synologyapi', 'debug', '[Mise à jour de] Lancer le contrôle ** '.$cmd->getName()." **");
 					//2 lignes inutiles car le controle se fait déja au moment de preSave
 					//$resultat=$cmd->faireTestExpression($cmd->getConfiguration('controle'));
 					//$cmd->setConfiguration('resultat', $resultat);
@@ -132,6 +137,129 @@ public static function update() {
 				}
 		
 	}
+	
+	public function vaChercherSID($idsynology) {
+		//log::add('synologyapi', 'debug', 'lancement  vaChercherSID '.$idsynology);
+	
+		if ($idsynology == "2") {
+			$server = config::byKey('Syno2_server','synologyapi');
+			$login = config::byKey('Syno2_login','synologyapi');
+			$pass = config::byKey('Syno2_password','synologyapi');
+			$nomSynology = config::byKey('Syno2_name','synologyapi');
+			}
+		elseif ($idsynology == "3") {
+			$server = config::byKey('Syno3_server','synologyapi');
+			$login = config::byKey('Syno3_login','synologyapi');
+			$pass = config::byKey('Syno3_password','synologyapi');
+			$nomSynology = config::byKey('Syno3_name','synologyapi');
+			}
+		else {
+			$server = config::byKey('Syno1_server','synologyapi');
+			$login = config::byKey('Syno1_login','synologyapi');
+			$pass = config::byKey('Syno1_password','synologyapi');
+			$nomSynology = config::byKey('Syno1_name','synologyapi');
+			}
+
+		//echo "<b>API demandée</b> : ".str_replace("SYNO.", "", $API)." <b>sur</b> ".$nomSynology; 
+		//echo "<br><b>Paramètres</b> : ".str_replace("v=d&plugin=synologyapi&modal=testAPI&", "", str_replace("SYNO.", "", $parametresAPI))."<hr>"; 
+
+		//Define ssl arguments
+		$arrContextOptions=array(
+			"ssl"=>array(
+				"verify_peer"=>false,
+				"verify_peer_name"=>false,
+			),
+		);
+
+		//Get SYNO.API.Auth Path (recommended by Synology for further update) and maxVersion
+		// https://192.168.0.1:1976/webapi/query.cgi?api=SYNO.API.Info&version=1&method=query&query=SYNO.API.Auth
+		$json = file_get_contents($server.'/webapi/query.cgi?api=SYNO.API.Info&version=1&method=query&query=SYNO.API.Auth', false, stream_context_create($arrContextOptions));
+
+		$obj = json_decode($json);
+		$path = $obj->data->{'SYNO.API.Auth'}->path;
+		$vAuth = $obj->data->{'SYNO.API.Auth'}->maxVersion;
+		//https://192.168.0.4:1975/webapi/auth.cgi?api=SYNO.API.Auth&method=Login&version=2&account=admin&passwd=christel
+		$requeteaEnvoyer=$server.'/webapi/'.$path.'?api=SYNO.API.Auth&version='.$vAuth.'&method=login&account='.$login.'&passwd='.$pass.'&format=sid';
+		//echo "<br>A envoyer :".$requeteaEnvoyer;
+		//log::add('synologyapi', 'debug', 'Identification A envoyer :'.$requeteaEnvoyer);		
+		$json_login = file_get_contents($requeteaEnvoyer, false, stream_context_create($arrContextOptions));
+		$obj_login = json_decode($json_login);
+		//echo $server.'/webapi/'.$path.'?api=SYNO.API.Auth&version='.$vAuth.'&method=login&account='.$login.'&passwd='.$pass.'&format=sid';
+
+		if($obj_login->success != "true"){	echo "Login FAILED core";return false;}
+			$sid = $obj_login->data->sid;
+		//log::add('synologyapi', 'debug', 'Login OK '.$sid);
+		return $sid;
+	}
+
+	public function recupereDonneesJson ($sid,$API,$parametresAPI,$parameters,$idsynology)
+	{
+	//log::add('synologyapi', 'debug', 'lancement  recupereDonneesJson '.$API);
+
+	//echo "<br><b>MD5</b> : ".$md5."<hr>"; 
+	//Define ssl arguments
+	$arrContextOptions=array(
+		"ssl"=>array(
+			"verify_peer"=>false,
+			"verify_peer_name"=>false,
+		),
+	);
+
+	if ($idsynology == "2") {
+		$server = config::byKey('Syno2_server','synologyapi');
+		$login = config::byKey('Syno2_login','synologyapi');
+		$pass = config::byKey('Syno2_password','synologyapi');
+		$nomSynology = config::byKey('Syno2_name','synologyapi');
+		}
+	elseif ($idsynology == "3") {
+		$server = config::byKey('Syno3_server','synologyapi');
+		$login = config::byKey('Syno3_login','synologyapi');
+		$pass = config::byKey('Syno3_password','synologyapi');
+		$nomSynology = config::byKey('Syno3_name','synologyapi');
+		}
+	else {
+		$server = config::byKey('Syno1_server','synologyapi');
+		$login = config::byKey('Syno1_login','synologyapi');
+		$pass = config::byKey('Syno1_password','synologyapi');
+		$nomSynology = config::byKey('Syno1_name','synologyapi');
+		}
+
+		$RequeteaEnvoyer=$server.'/webapi/query.cgi?api=SYNO.API.Info&method=Query&version=1&query='.$API;
+		//echo "<br>A envoyer :".$RequeteaEnvoyer;
+		//log::add('synologyapi', 'debug', 'A envoyer :'.$RequeteaEnvoyer);
+
+		$json_core = file_get_contents($RequeteaEnvoyer, false, stream_context_create($arrContextOptions));
+		$obj_core = json_decode($json_core);
+		$path_core = $obj_core->data->{$API}->path;	
+		$vCore = $obj_core->data->{$API}->maxVersion;	
+
+		// DEV: LINK FOR LIVE CPU MEMORY AND NETWORK DATA INFO
+		//echo '<p>Login SUCCESS! : sid = '.$sid.'</p>';
+		//echo '<p>success 2: api path = '.$path_core.'</p>';
+		// https://trionix.homeftp.net:5555/webapi/_______________________________________________________entry.cgi?api=SYNO.Core.System.Utilization&method=get&version=1&type=current&resource=cpu	
+
+		//echo $server.'/webapi/'.$path_core.'?api=SYNO.Core.System.Utilization&version='.$vCore.'&method=get&type=current&_sid='.$sid;
+
+		 
+		//json of SYNO.Core.System.Utilization (cpu, mem, network etc)
+		$RequeteaEnvoyer=$server.'/webapi/'.$path_core.$parametresAPI.'&version='.$vCore.'&_sid='.$sid.$parameters;
+		//echo "<br>".$RequeteaEnvoyer;
+		log::add('synologyapi', 'debug', 'A envoyer :'.$RequeteaEnvoyer);
+
+		//echo "<br>";
+		$json_Data = file_get_contents($RequeteaEnvoyer, false, stream_context_create($arrContextOptions));
+		$obj_Data = json_decode($json_Data, true);
+		//echo "<br>avant boucke";
+		//echo "Retour:".$obj_Data;
+		//echo $json_coreData;
+		//$array1 = array("color" => "red", 2, 4);
+		//$array2 = array("a", "b", "color" => "green", "shape" => "trapezoid", 4);
+		//$result = array_merge($array1, $array2);
+
+	return $obj_Data;
+
+	}	
+
     
  // Fonction exécutée automatiquement avant la création de l'équipement 
     public function preInsert() {
