@@ -26,7 +26,7 @@ $eqLogics = eqLogic::byType($plugin->getId());
   
 <!-- -------------- Premier SYNO ---------------->  
 <input class="form-control" placeholder="{{Rechercher}}" id="in_searchEqlogic" />
-<legend style="color:#221916"><i class="fas fa-cogs"></i> {{API de <?php echo config::byKey('Syno1_name','synologyapi')?>}}</legend>
+<legend ><i class="fas fa-cogs"></i> {{API de <?php echo config::byKey('Syno1_name','synologyapi')?>}}</legend>
 <div class="eqLogicThumbnailContainer">
     <?php
 foreach ($eqLogics as $eqLogic) {
@@ -45,7 +45,7 @@ echo "</div>";
 
 	if (config::byKey('Syno2_name','synologyapi')!="") {
 	?>
-	<legend style="color:#221916"><i class="fas fa-cogs"></i> {{API de <?php echo config::byKey('Syno2_name','synologyapi')?>}}</legend>
+	<legend ><i class="fas fa-cogs"></i> {{API de <?php echo config::byKey('Syno2_name','synologyapi')?>}}</legend>
 	<div class="eqLogicThumbnailContainer">
 		<?php
 	foreach ($eqLogics as $eqLogic) {
@@ -65,7 +65,7 @@ echo "</div>";
 
 	if (config::byKey('Syno3_name','synologyapi')!="") {
 	?>
-	<legend style="color:#221916"><i class="fas fa-cogs"></i> {{API de <?php echo config::byKey('Syno3_name','synologyapi')?>}}</legend>
+	<legend ><i class="fas fa-cogs"></i> {{API de <?php echo config::byKey('Syno3_name','synologyapi')?>}}</legend>
 	<div class="eqLogicThumbnailContainer">
 		<?php
 	foreach ($eqLogics as $eqLogic) {
