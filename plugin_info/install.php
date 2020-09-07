@@ -29,7 +29,7 @@ function synologyapi_install() {
 		$cron->setEnable(1);
 		$cron->setDeamon(0);
 		$cron->setSchedule('* * * * *');
-		$cron->setTimeout(30);
+		$cron->setTimeout(2);
 		$cron->save();
 	}
 }
@@ -44,7 +44,7 @@ function synologyapi_update() {
 	$cron->setEnable(1);
 	$cron->setDeamon(0);
 	$cron->setSchedule('* * * * *');
-	$cron->setTimeout(30);
+	$cron->setTimeout(2);
 	$cron->save();
 	$cron->stop();
 }

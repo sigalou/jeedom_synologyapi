@@ -79,6 +79,13 @@ class synologyapi extends eqLogic {
 //Ajouté par l'installateur, c'est un cron exécuté toutes les minutes
 public static function update() {
 		
+		// On va chercher un SID pour chaque synology
+		$ArraySID=array();
+		if (config::byKey('Syno1_name','synologyapi') !="" )	$ArraySID[1]=self::vaChercherSID("1");	else 	$ArraySID[1]="";
+		if (config::byKey('Syno2_name','synologyapi') !="" )	$ArraySID[2]=self::vaChercherSID("2");	else 	$ArraySID[2]="";
+		if (config::byKey('Syno3_name','synologyapi') !="" )	$ArraySID[3]=self::vaChercherSID("3");	else 	$ArraySID[3]="";
+				
+		
 		foreach (self::byType('synologyapi') as $synologyapi) {
 
 			//log::add('synologyapi','debug','Lancement update de '.$synologyapi->getName().' ('.$synologyapi->getConfiguration('device').')');
@@ -100,7 +107,7 @@ public static function update() {
 							log::add('synologyapi','debug','-----------------------------------------------------------------');
 							log::add('synologyapi','debug',"Actualisation des données de l'API ".$synologyapi->getName().' ('.$synologyapi->getConfiguration('device').') sur '.$nomSynology);
 							log::add('synologyapi','debug','-----------------------------------------------------------------');
-							$synologyapi->lancerControle($synologyapi);
+							$synologyapi->lancerControle($synologyapi, $ArraySID);
 							//log::add('synologyapi','debug','fin cron-----------------------------------------------------------------');
 						} catch (Exception $exc) {
 							log::add('synologyapi', 'error', __('Erreur pour ', __FILE__) . $synologyapi->getHumanName() . ' : ' . $exc->getMessage());
@@ -114,13 +121,17 @@ public static function update() {
 		}
 	}
 
-	public function lancerControle($synologyapi) {
+	public function lancerControle($synologyapi,$ArraySID) {
+		
+		log::add('synologyapi', 'debug', "$ArraySID ".json_encode($ArraySID));
 		
 		$requeteaEnvoyer=$synologyapi->getConfiguration('urlAPI');
 		$requeteaEnvoyer=str_replace("amp;", "", $requeteaEnvoyer);//rustine toujours ce souci de amp;
 
 		log::add('synologyapi', 'debug', "Il faut lancer ".$requeteaEnvoyer);
-		$sid=self::vaChercherSID($synologyapi->getConfiguration('devicetype'));
+		
+		if (count($ArraySID)==0) $sid=self::vaChercherSID($synologyapi->getConfiguration('devicetype'));
+		else $sid=$ArraySID[$synologyapi->getConfiguration('devicetype')];
 		//log::add('synologyapi', 'debug', 'OK '.$sid);
 
 		$obj_Data=self::recupereDonneesJson ($sid, "SYNO.".$synologyapi->getConfiguration('device'), $requeteaEnvoyer, "", $idsynology);
@@ -139,7 +150,7 @@ public static function update() {
 	}
 	
 	public function vaChercherSID($idsynology) {
-		//log::add('synologyapi', 'debug', 'lancement  vaChercherSID '.$idsynology);
+		log::add('synologyapi', 'debug', 'lancement  vaChercherSID '.$idsynology);
 	
 		if ($idsynology == "2") {
 			$server = config::byKey('Syno2_server','synologyapi');
@@ -164,17 +175,22 @@ public static function update() {
 		//echo "<br><b>Paramètres</b> : ".str_replace("v=d&plugin=synologyapi&modal=testAPI&", "", str_replace("SYNO.", "", $parametresAPI))."<hr>"; 
 
 		//Define ssl arguments
-		$arrContextOptions=array(
+$arrContextOptions=array(
 			"ssl"=>array(
 				"verify_peer"=>false,
 				"verify_peer_name"=>false,
 			),
+			"http"=>array(
+					"timeout" => 50, //50s
+				)
 		);
 
 		//Get SYNO.API.Auth Path (recommended by Synology for further update) and maxVersion
 		// https://192.168.0.1:1976/webapi/query.cgi?api=SYNO.API.Info&version=1&method=query&query=SYNO.API.Auth
+		$begin_time = array_sum(explode(' ', microtime()));
 		$json = file_get_contents($server.'/webapi/query.cgi?api=SYNO.API.Info&version=1&method=query&query=SYNO.API.Auth', false, stream_context_create($arrContextOptions));
-
+		$end_time = array_sum(explode(' ', microtime()));
+		log::add('synologyapi', 'debug', 'Le temps d\'exécution est '.($end_time - $begin_time));
 		$obj = json_decode($json);
 		$path = $obj->data->{'SYNO.API.Auth'}->path;
 		$vAuth = $obj->data->{'SYNO.API.Auth'}->maxVersion;
@@ -200,12 +216,16 @@ public static function update() {
 
 	//echo "<br><b>MD5</b> : ".$md5."<hr>"; 
 	//Define ssl arguments
-	$arrContextOptions=array(
-		"ssl"=>array(
-			"verify_peer"=>false,
-			"verify_peer_name"=>false,
-		),
-	);
+		//Define ssl arguments
+$arrContextOptions=array(
+			"ssl"=>array(
+				"verify_peer"=>false,
+				"verify_peer_name"=>false,
+			),
+			"http"=>array(
+					"timeout" => 50, //50s
+				)
+		);
 
 	if ($idsynology == "2") {
 		$server = config::byKey('Syno2_server','synologyapi');
@@ -229,12 +249,22 @@ public static function update() {
 		$RequeteaEnvoyer=$server.'/webapi/query.cgi?api=SYNO.API.Info&method=Query&version=1&query='.$API;
 		//echo "<br>A envoyer :".$RequeteaEnvoyer;
 		//log::add('synologyapi', 'debug', 'A envoyer :'.$RequeteaEnvoyer);
-
+		
+		
+		$begin_time = array_sum(explode(' ', microtime()));
 		$json_core = file_get_contents($RequeteaEnvoyer, false, stream_context_create($arrContextOptions));
+		$end_time = array_sum(explode(' ', microtime()));
+		log::add('synologyapi', 'debug', 'Le temps d\'exécution est '.($end_time - $begin_time));
 		$obj_core = json_decode($json_core);
 		$path_core = $obj_core->data->{$API}->path;	
 		$vCore = $obj_core->data->{$API}->maxVersion;	
-
+		
+		/*
+		$vCore = "1";
+		$path_core = "entry.cgi";	
+		log::add('synologyapi', 'debug', 'path : '.$path_core);
+		log::add('synologyapi', 'debug', 'version : '.$vCore);
+*/
 		// DEV: LINK FOR LIVE CPU MEMORY AND NETWORK DATA INFO
 		//echo '<p>Login SUCCESS! : sid = '.$sid.'</p>';
 		//echo '<p>success 2: api path = '.$path_core.'</p>';
@@ -248,8 +278,10 @@ public static function update() {
 		//echo "<br>".$RequeteaEnvoyer;
 		log::add('synologyapi', 'debug', 'A envoyer :'.$RequeteaEnvoyer);
 
-		//echo "<br>";
+		$begin_time = array_sum(explode(' ', microtime()));
 		$json_Data = file_get_contents($RequeteaEnvoyer, false, stream_context_create($arrContextOptions));
+		$end_time = array_sum(explode(' ', microtime()));
+		log::add('synologyapi', 'debug', 'Le temps d\'exécution est '.($end_time - $begin_time));
 		$obj_Data = json_decode($json_Data, true);
 		//echo "<br>avant boucke";
 		//echo "Retour:".$obj_Data;

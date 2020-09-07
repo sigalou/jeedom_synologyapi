@@ -39,9 +39,9 @@ function getURI(){
   //recupereDonneesJson ($sid,"SYNO.Core.CurrentConnection","list&start=0&limit=50&sort_by=%22time%22&sort_direction=%22DESC%22&offset=0&action=%22enum%22",$server,$arrContextOptions);
   
   
-echo "<br>API : ".$API; 
-echo "<br>parametresAPI : ".$parametresAPI; 
-echo "<br>parameters : ".$parameters; 
+//echo "<br>API : ".$API; 
+//echo "<br>parametresAPI : ".$parametresAPI; 
+//echo "<br>parameters : ".$parameters; 
 
   
 		$obj_Data=synologyapi::recupereDonneesJson ($sid, $API, $parametresAPI, $parameters, $idsynology);
