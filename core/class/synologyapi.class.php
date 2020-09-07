@@ -179,8 +179,10 @@ public static function update() {
 		$path = $obj->data->{'SYNO.API.Auth'}->path;
 		$vAuth = $obj->data->{'SYNO.API.Auth'}->maxVersion;
 		//https://192.168.0.4:1975/webapi/auth.cgi?api=SYNO.API.Auth&method=Login&version=2&account=admin&passwd=christel
+		//$vAuth='2';
 		$requeteaEnvoyer=$server.'/webapi/'.$path.'?api=SYNO.API.Auth&version='.$vAuth.'&method=login&account='.$login.'&passwd='.$pass.'&format=sid';
-		//echo "<br>A envoyer :".$requeteaEnvoyer;
+		//echo "<br>A envoyer pour le LOGIN :".$requeteaEnvoyer;
+		log::add('synologyapi', 'debug', "A envoyer pour le LOGIN :".$requeteaEnvoyer);
 		//log::add('synologyapi', 'debug', 'Identification A envoyer :'.$requeteaEnvoyer);		
 		$json_login = file_get_contents($requeteaEnvoyer, false, stream_context_create($arrContextOptions));
 		$obj_login = json_decode($json_login);
@@ -188,7 +190,7 @@ public static function update() {
 
 		if($obj_login->success != "true"){	echo "Login FAILED core";return false;}
 			$sid = $obj_login->data->sid;
-		//log::add('synologyapi', 'debug', 'Login OK '.$sid);
+		log::add('synologyapi', 'debug', 'Login OK '.$sid." sur Synology ".$idsynology);
 		return $sid;
 	}
 

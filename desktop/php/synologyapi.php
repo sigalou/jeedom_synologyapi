@@ -18,9 +18,9 @@ $eqLogics = eqLogic::byType($plugin->getId());
     </div>
 	
       <div class="cursor eqLogicAction logoSecondary" data-action="gotoPluginConf">
-      <i class="fas fa-wrench" style="color:#221916"></i>
+      <i class="fas fa-wrench" ></i>
     <br>
-    <span style="color:#221916">{{Configuration}}</span>
+    <span >{{Configuration}}</span>
   </div>
   </div>
   
@@ -35,7 +35,7 @@ foreach ($eqLogics as $eqLogic) {
 		echo '<div class="eqLogicDisplayCard cursor '.$opacity.'" data-eqLogic_id="' . $eqLogic->getId() . '">';
 		echo '<img src="' . $plugin->getPathImgIcon() . '"/>';
 		echo '<br>';
-		echo '<span class="name" style="color:#221916">' . $eqLogic->getHumanName(true, true) . '</span>';
+		echo '<span class="name" >' . $eqLogic->getHumanName(true, true) . '</span>';
 		echo '</div>';
 		}
 }
@@ -54,7 +54,7 @@ echo "</div>";
 			echo '<div class="eqLogicDisplayCard cursor '.$opacity.'" data-eqLogic_id="' . $eqLogic->getId() . '">';
 			echo '<img src="' . $plugin->getPathImgIcon() . '"/>';
 			echo '<br>';
-			echo '<span class="name" style="color:#221916">' . $eqLogic->getHumanName(true, true) . '</span>';
+			echo '<span class="name" >' . $eqLogic->getHumanName(true, true) . '</span>';
 			echo '</div>';
 			}
 	}
@@ -100,7 +100,7 @@ echo "</div>";
       <br/>
     <form class="form-horizontal">
         <fieldset>
-	<br><legend><i class="fas fa-cogs" style="font-size : 2em;color:#221916;"></i> <span style="color:#221916">{{Identification de l'API à utiliser}}</span></legend>
+	<br><legend><i class="fas fa-cogs" style="font-size : 2em;"></i> <span >{{Identification de l'API à utiliser}}</span></legend>
             <div class="form-group">
                 <label class="col-sm-3 control-label">{{Nom de l'API personnalisé}}</label>
                 <div class="col-sm-3">
@@ -158,7 +158,7 @@ foreach (jeeObject::all() as $object) {
 	</div>
 
 
-<br><legend><i class="far fa-clock" style="font-size : 2em;color:#221916;"></i> <span style="color:#221916">{{Actualisation périodique des données}}</span></legend>
+<br><legend><i class="far fa-clock" style="font-size : 2em;"></i> <span >{{Actualisation périodique des données}}</span></legend>
 
 	<br><br>
 	

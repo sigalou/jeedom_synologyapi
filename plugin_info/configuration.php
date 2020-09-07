@@ -33,7 +33,7 @@ if (!isConnect()) {
 				<input class="configKey form-control" data-l1key="Syno1_name" placeholder="{{Mon Syno1}}" />
 			</div>
 			<div class="col-lg-4">
-				<input class="configKey form-control" data-l1key="Syno1_server" placeholder="{{https://192.168.0.4:1975}}" />
+				<input class="configKey form-control" data-l1key="Syno1_server" placeholder="{{https://192.168.0.4:8001}}" />
 			</div>
 		</div>
 		<div class="form-group">
@@ -58,7 +58,7 @@ if (!isConnect()) {
 				<input class="configKey form-control" data-l1key="Syno2_name" placeholder="{{Mon Syno3}}" />
 			</div>
 			<div class="col-lg-4">
-				<input class="configKey form-control" data-l1key="Syno2_server" placeholder="{{https://192.168.0.4:1975}}" />
+				<input class="configKey form-control" data-l1key="Syno2_server" placeholder="{{https://192.168.0.4:4001}}" />
 			</div>
 		</div>
 		<div class="form-group">
@@ -83,7 +83,7 @@ if (!isConnect()) {
 				<input class="configKey form-control" data-l1key="Syno3_name" placeholder="{{Mon Syno3}}" />
 			</div>
 			<div class="col-lg-4">
-				<input class="configKey form-control" data-l1key="Syno3_server" placeholder="{{https://192.168.0.4:1975}}" />
+				<input class="configKey form-control" data-l1key="Syno3_server" placeholder="{{https://192.168.0.4:8001}}" />
 			</div>
 		</div>
 		<div class="form-group">
