@@ -78,6 +78,13 @@ class synologyapi extends eqLogic {
 
 //Ajouté par l'installateur, c'est un cron exécuté toutes les minutes
 public static function update() {
+			
+			
+		log::add('synologyapi','debug','');
+		log::add('synologyapi','debug','');
+		log::add('synologyapi','debug','');
+		log::add('synologyapi','debug','');
+		log::add('synologyapi','debug','Lancement update');
 		
 		// On va chercher un SID pour chaque synology
 		$ArraySID=array();
@@ -137,16 +144,58 @@ public static function update() {
 		$obj_Data=self::recupereDonneesJson ($sid, "SYNO.".$synologyapi->getConfiguration('device'), $requeteaEnvoyer, "", $idsynology);
 		//echo "résultat :".json_encode($obj_Data);
 		log::add('synologyapi', 'debug', "résultat :".json_encode($obj_Data));
-
+		
+		
+		if ($obj_Data['success']== true) {
 		foreach ($synologyapi->getCmd('info') as $cmd) {
-					//log::add('synologyapi', 'debug', '[Mise à jour de] Lancer le contrôle ** '.$cmd->getName()." **");
+					//log::add('synologyapi', 'debug', '[Mise à jour de] '.$cmd->getName()." (".$cmd->getConfiguration('requestAPI').")");
+					
+					$syntaxedeBase=$cmd->getConfiguration('requestAPI');
+					$nbdeNiveaux=mb_substr_count($syntaxedeBase, ".");
+					$parchamps = explode(".", $syntaxedeBase);
+					//log::add('synologyapi', 'debug', '[count] '.$nbdeNiveaux);
+					//log::add('synologyapi', 'debug', '[parchamps] '.$parchamps[1]);
+					//log::add('synologyapi', 'debug', '[parchamps] '.json_encode($parchamps));
+					$value="rien";
+					switch ($nbdeNiveaux) {
+									case 0:
+										$value=$obj_Data[$parchamps[0]];
+										break;
+									case 1:
+										$value=$obj_Data	[$parchamps[0]]
+															[$parchamps[1]];
+										break;
+									case 2:
+										$value=$obj_Data	[$parchamps[0]]
+															[$parchamps[1]]
+															[$parchamps[2]];
+										break;
+									case 3:
+										$value=$obj_Data	[$parchamps[0]]
+															[$parchamps[1]]
+															[$parchamps[2]]
+															[$parchamps[3]];										
+										break;
+									case 4:
+										$value=$obj_Data	[$parchamps[0]]
+															[$parchamps[1]]
+															[$parchamps[2]]
+															[$parchamps[3]]
+															[$parchamps[4]];
+										break;
+								}
+					log::add('synologyapi', 'debug', '[valeur] '.$cmd->getName()." : ".$value);
+					$synologyapi->checkAndUpdateCmd($cmd,$value);
+
 					//2 lignes inutiles car le controle se fait déja au moment de preSave
 					//$resultat=$cmd->faireTestExpression($cmd->getConfiguration('controle'));
 					//$cmd->setConfiguration('resultat', $resultat);
 					//$cmd->save();
 					//log::add('synologyapi', 'debug', '[>>>>FIN>>>>Contrôle] Lancer le contrôle ** '.$cmd->getName()." **");
 				}
-		
+		} else 
+		log::add('synologyapi', 'debug', "ECHEC-ECHEC-ECHEC-ECHEC-ECHEC-ECHEC-ECHEC-ECHEC-ECHEC-ECHEC-ECHEC-ECHEC-ECHEC-");
+			
 	}
 	
 	public function vaChercherSID($idsynology) {
