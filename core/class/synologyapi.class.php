@@ -80,11 +80,8 @@ class synologyapi extends eqLogic {
 public static function update() {
 			
 			
-		log::add('synologyapi','debug','');
-		log::add('synologyapi','debug','');
-		log::add('synologyapi','debug','');
-		log::add('synologyapi','debug','');
-		log::add('synologyapi','debug','Lancement update');
+		//log::add('synologyapi','debug',"Lancement de l'actualisation automatique des données");
+		log::add('synologyapi', 'info', " ╔══════════════════════[Lancement de l'actualisation automatique des données]═════════════════════════════════════════════════════════");
 		
 		// On va chercher un SID pour chaque synology
 		$ArraySID=array();
@@ -111,10 +108,25 @@ public static function update() {
 							else 														  $nomSynology = config::byKey('Syno1_name','synologyapi');
 							//$synologyapi->setConfiguration('boucleEnCours', "CRON");
 							//$_boucleEnCours="CRON";
-							log::add('synologyapi','debug','-----------------------------------------------------------------');
-							log::add('synologyapi','debug',"Actualisation des données de l'API ".$synologyapi->getName().' ('.$synologyapi->getConfiguration('device').') sur '.$nomSynology);
-							log::add('synologyapi','debug','-----------------------------------------------------------------');
-							$synologyapi->lancerControle($synologyapi, $ArraySID);
+							//log::add('synologyapi','debug','-----------------------------------------------------------------');
+							//log::add('synologyapi','debug',"Actualisation des données de l'API ".$synologyapi->getName().' ('.$synologyapi->getConfiguration('device').') sur '.$nomSynology);
+							log::add('synologyapi', 'info', " ║");
+							log::add('synologyapi', 'info', " ╠═ Actualisation des données de l'API ".$synologyapi->getName().' ('.$synologyapi->getConfiguration('device').') sur '.$nomSynology);
+
+							//log::add('synologyapi','debug','-----------------------------------------------------------------');
+							$nbmaxdetentative=3;//a voir si on le met en paramètre
+							$compteerreur=0;
+							$RequeteOK=false;
+
+							while (($compteerreur <= $nbmaxdetentative) && (!$RequeteOK)) {
+								$RequeteOK=$synologyapi->lancerControle($synologyapi, $ArraySID);
+								// on va rechercher SID pour faire un genre de pause
+								if (config::byKey('Syno1_name','synologyapi') !="" )	$ArraySID[1]=self::vaChercherSID("1");	else 	$ArraySID[1]="";
+								if (config::byKey('Syno2_name','synologyapi') !="" )	$ArraySID[2]=self::vaChercherSID("2");	else 	$ArraySID[2]="";
+								if (config::byKey('Syno3_name','synologyapi') !="" )	$ArraySID[3]=self::vaChercherSID("3");	else 	$ArraySID[3]="";
+								$compteerreur++;
+							}
+
 							//log::add('synologyapi','debug','fin cron-----------------------------------------------------------------');
 						} catch (Exception $exc) {
 							log::add('synologyapi', 'error', __('Erreur pour ', __FILE__) . $synologyapi->getHumanName() . ' : ' . $exc->getMessage());
@@ -126,24 +138,27 @@ public static function update() {
 				}
 			}
 		}
+	log::add('synologyapi', 'info', ' ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════');
+
 	}
 
 	public function lancerControle($synologyapi,$ArraySID) {
 		
-		log::add('synologyapi', 'debug', "$ArraySID ".json_encode($ArraySID));
+		//log::add('synologyapi', 'debug', "$ArraySID ".json_encode($ArraySID));
 		
 		$requeteaEnvoyer=$synologyapi->getConfiguration('urlAPI');
+		$idsynology=$synologyapi->getConfiguration('devicetype');
 		$requeteaEnvoyer=str_replace("amp;", "", $requeteaEnvoyer);//rustine toujours ce souci de amp;
 
-		log::add('synologyapi', 'debug', "Il faut lancer ".$requeteaEnvoyer);
+		//log::add('synologyapi', 'debug', "Il faut lancer ".$requeteaEnvoyer);
 		
 		if (count($ArraySID)==0) $sid=self::vaChercherSID($synologyapi->getConfiguration('devicetype'));
 		else $sid=$ArraySID[$synologyapi->getConfiguration('devicetype')];
-		//log::add('synologyapi', 'debug', 'OK '.$sid);
 
 		$obj_Data=self::recupereDonneesJson ($sid, "SYNO.".$synologyapi->getConfiguration('device'), $requeteaEnvoyer, "", $idsynology);
 		//echo "résultat :".json_encode($obj_Data);
-		log::add('synologyapi', 'debug', "résultat :".json_encode($obj_Data));
+		//log::add('synologyapi', 'debug', "résultat :".json_encode($obj_Data));
+		log::add('synologyapi', 'debug', "╠═══> Résultat :".json_encode($obj_Data));
 		
 		
 		if ($obj_Data['success']== true) {
@@ -184,7 +199,10 @@ public static function update() {
 															[$parchamps[4]];
 										break;
 								}
-					log::add('synologyapi', 'debug', '[valeur] '.$cmd->getName()." : ".$value);
+					
+					log::add('synologyapi', 'info', " ╠═ ".$cmd->getName()." = ".$value);
+
+					//log::add('synologyapi', 'debug', '[valeur] '.$cmd->getName()." : ".$value);
 					$synologyapi->checkAndUpdateCmd($cmd,$value);
 
 					//2 lignes inutiles car le controle se fait déja au moment de preSave
@@ -193,13 +211,14 @@ public static function update() {
 					//$cmd->save();
 					//log::add('synologyapi', 'debug', '[>>>>FIN>>>>Contrôle] Lancer le contrôle ** '.$cmd->getName()." **");
 				}
+			return true;
 		} else 
-		log::add('synologyapi', 'debug', "ECHEC-ECHEC-ECHEC-ECHEC-ECHEC-ECHEC-ECHEC-ECHEC-ECHEC-ECHEC-ECHEC-ECHEC-ECHEC-");
-			
+		log::add('synologyapi', 'debug', "║ ECHEC-ECHEC-ECHEC-ECHEC-ECHEC-ECHEC-ECHEC-ECHEC-ECHEC-ECHEC-ECHEC-ECHEC-ECHEC");
+			return false;
 	}
 	
 	public function vaChercherSID($idsynology) {
-		log::add('synologyapi', 'debug', 'lancement  vaChercherSID '.$idsynology);
+		//log::add('synologyapi', 'debug', 'lancement  vaChercherSID '.$idsynology);
 	
 		if ($idsynology == "2") {
 			$server = config::byKey('Syno2_server','synologyapi');
@@ -239,7 +258,7 @@ $arrContextOptions=array(
 		$begin_time = array_sum(explode(' ', microtime()));
 		$json = file_get_contents($server.'/webapi/query.cgi?api=SYNO.API.Info&version=1&method=query&query=SYNO.API.Auth', false, stream_context_create($arrContextOptions));
 		$end_time = array_sum(explode(' ', microtime()));
-		log::add('synologyapi', 'debug', 'Le temps d\'exécution est '.($end_time - $begin_time));
+		//log::add('synologyapi', 'debug', 'Le temps d\'exécution est '.($end_time - $begin_time));
 		$obj = json_decode($json);
 		$path = $obj->data->{'SYNO.API.Auth'}->path;
 		$vAuth = $obj->data->{'SYNO.API.Auth'}->maxVersion;
@@ -247,7 +266,7 @@ $arrContextOptions=array(
 		//$vAuth='2';
 		$requeteaEnvoyer=$server.'/webapi/'.$path.'?api=SYNO.API.Auth&version='.$vAuth.'&method=login&account='.$login.'&passwd='.$pass.'&format=sid';
 		//echo "<br>A envoyer pour le LOGIN :".$requeteaEnvoyer;
-		log::add('synologyapi', 'debug', "A envoyer pour le LOGIN :".$requeteaEnvoyer);
+		//log::add('synologyapi', 'debug', "A envoyer pour le LOGIN :".$requeteaEnvoyer);
 		//log::add('synologyapi', 'debug', 'Identification A envoyer :'.$requeteaEnvoyer);		
 		$json_login = file_get_contents($requeteaEnvoyer, false, stream_context_create($arrContextOptions));
 		$obj_login = json_decode($json_login);
@@ -255,7 +274,9 @@ $arrContextOptions=array(
 
 		if($obj_login->success != "true"){	echo "Login FAILED core";return false;}
 			$sid = $obj_login->data->sid;
-		log::add('synologyapi', 'debug', 'Login OK '.$sid." sur Synology ".$idsynology);
+		//log::add('synologyapi', 'debug', "Login OK sur Synology N°".$idsynology." (".$sid.")");
+		log::add('synologyapi', 'debug', '╠═ Login OK sur Synology N°'.$idsynology." (".$sid.")");		
+
 		return $sid;
 	}
 
@@ -294,16 +315,18 @@ $arrContextOptions=array(
 		$pass = config::byKey('Syno1_password','synologyapi');
 		$nomSynology = config::byKey('Syno1_name','synologyapi');
 		}
+		//log::add('synologyapi', 'debug', '***********idsynology :'.$idsynology);
+		//log::add('synologyapi', 'debug', '***********server :'.$server);
 
 		$RequeteaEnvoyer=$server.'/webapi/query.cgi?api=SYNO.API.Info&method=Query&version=1&query='.$API;
 		//echo "<br>A envoyer :".$RequeteaEnvoyer;
 		//log::add('synologyapi', 'debug', 'A envoyer :'.$RequeteaEnvoyer);
 		
 		
-		$begin_time = array_sum(explode(' ', microtime()));
+		//$begin_time = array_sum(explode(' ', microtime()));
 		$json_core = file_get_contents($RequeteaEnvoyer, false, stream_context_create($arrContextOptions));
-		$end_time = array_sum(explode(' ', microtime()));
-		log::add('synologyapi', 'debug', 'Le temps d\'exécution est '.($end_time - $begin_time));
+		//$end_time = array_sum(explode(' ', microtime()));
+		//log::add('synologyapi', 'debug', 'Le temps d\'exécution est '.($end_time - $begin_time));
 		$obj_core = json_decode($json_core);
 		$path_core = $obj_core->data->{$API}->path;	
 		$vCore = $obj_core->data->{$API}->maxVersion;	
@@ -325,12 +348,12 @@ $arrContextOptions=array(
 		//json of SYNO.Core.System.Utilization (cpu, mem, network etc)
 		$RequeteaEnvoyer=$server.'/webapi/'.$path_core.$parametresAPI.'&version='.$vCore.'&_sid='.$sid.$parameters;
 		//echo "<br>".$RequeteaEnvoyer;
-		log::add('synologyapi', 'debug', 'A envoyer :'.$RequeteaEnvoyer);
+		//log::add('synologyapi', 'debug', 'A envoyer :'.$RequeteaEnvoyer);
 
-		$begin_time = array_sum(explode(' ', microtime()));
+		//$begin_time = array_sum(explode(' ', microtime()));
 		$json_Data = file_get_contents($RequeteaEnvoyer, false, stream_context_create($arrContextOptions));
-		$end_time = array_sum(explode(' ', microtime()));
-		log::add('synologyapi', 'debug', 'Le temps d\'exécution est '.($end_time - $begin_time));
+		//$end_time = array_sum(explode(' ', microtime()));
+		//log::add('synologyapi', 'debug', 'Le temps d\'exécution est '.($end_time - $begin_time));
 		$obj_Data = json_decode($json_Data, true);
 		//echo "<br>avant boucke";
 		//echo "Retour:".$obj_Data;

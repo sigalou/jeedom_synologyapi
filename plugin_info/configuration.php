@@ -22,7 +22,11 @@ if (!isConnect()) {
     die();
 }
 ?>
-
+<style>
+	pre#pre_eventlog {
+		font-family: Menlo, Monaco, Consolas, "Courier New", monospace !important;
+	}
+</style>
 <form class="form-horizontal">
 	<fieldset>
 		<legend><i class="fas fa-server"></i> {{Synology 1}}</legend>
