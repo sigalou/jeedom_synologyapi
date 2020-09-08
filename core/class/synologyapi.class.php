@@ -120,6 +120,7 @@ public static function update() {
 
 							while (($compteerreur <= $nbmaxdetentative) && (!$RequeteOK)) {
 								$RequeteOK=$synologyapi->lancerControle($synologyapi, $ArraySID);
+								if ($RequeteOK) break; // pour ne pas executer la recherche de SID derrière
 								// on va rechercher SID pour faire un genre de pause
 								if (config::byKey('Syno1_name','synologyapi') !="" )	$ArraySID[1]=self::vaChercherSID("1");	else 	$ArraySID[1]="";
 								if (config::byKey('Syno2_name','synologyapi') !="" )	$ArraySID[2]=self::vaChercherSID("2");	else 	$ArraySID[2]="";

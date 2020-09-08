@@ -123,7 +123,7 @@ $LogicalId=$CMDaCreerouModifierCorrigee;
 		$newDevice->setDisplay('height', '500');
 		$newDevice->setConfiguration('device', $deviceName);
 		$newDevice->setConfiguration('serial', $deviceSerial);
-		$newDevice->setConfiguration('autorefresh', '*/30 * * * *');
+		$newDevice->setConfiguration('autorefresh', '* * * * *');
 		$newDevice->setIsEnable(1);
 		return $newDevice;
 	}
