@@ -79,11 +79,16 @@ foreach ($array as $value => $CMDaCreerouModifier)
 {
     $CMDaCreerouModifierCorrigee=str_replace("SYNO.", "", str_replace($API."-", "", str_replace("@", ".", $CMDaCreerouModifier)));
 	//echo $value; echo '-';
-    //echo "CMD : ".$CMDaCreerouModifierCorrigee; echo '<br />';
-//    echo "position : ".(strrpos($CMDaCreerouModifierCorrigee, '-')); echo '<br />';
-//    echo "test : ".substr($CMDaCreerouModifierCorrigee, 0,(strrpos($CMDaCreerouModifierCorrigee, '-'))); echo '<br />';
+//echo "CMD : ".$CMDaCreerouModifierCorrigee; echo '<br />';
+//$test=$CMDaCreerouModifierCorrigee."|truc|machin";
+//echo "test1 : ".$test; echo '<br />';
+ ////   echo "position : ".(strrpos($test, '|')); echo '<br />';
+  //  echo "test : ".substr($CMDaCreerouModifierCorrigee, 0,(strrpos($CMDaCreerouModifierCorrigee, '|'))); echo '<br />';
 
 $LogicalId=$CMDaCreerouModifierCorrigee;
+// $name=substr($CMDaCreerouModifierCorrigee, 1+(strrpos($CMDaCreerouModifierCorrigee, '|'))); Non utilisé car on veut le premier champs (CPU par exemple)
+$name=str_replace("data|", "", $CMDaCreerouModifierCorrigee); //On supprimer data|
+$name=str_replace("|", ":", $name); //On remplace | par : pour le nom de la commande soit plus sympa
 				$cmd = $device->getCmd(null, $LogicalId);
 				if ((!is_object($cmd))) {
 					if (!is_object($cmd)) $cmd = new alexaapiCmd();
@@ -91,7 +96,7 @@ $LogicalId=$CMDaCreerouModifierCorrigee;
 					$cmd->setLogicalId($LogicalId);
 					$cmd->setSubType('string');
 					$cmd->setEqLogic_id($device->getId());
-					$cmd->setName($LogicalId);
+					$cmd->setName($name);
 					$cmd->setIsVisible(1);
 					if (!empty($setDisplayicon)) $cmd->setDisplay('icon', '<i class="' . $setDisplayicon . '"></i>');
 					$cmd->setConfiguration('requestAPI', $CMDaCreerouModifierCorrigee);
@@ -101,10 +106,10 @@ $LogicalId=$CMDaCreerouModifierCorrigee;
 					//$cmd->setConfiguration('RunWhenRefresh', $RunWhenRefresh);
 					//$cmd->setDisplay('title_disable', $title_disable);
 				//	$cmd->setOrder($Order);
-				echo "<font color=#e0e2e2><B>".$CMDaCreerouModifierCorrigee."</B></font> --- <font color=#8fc935><b>Ajoutée</b></font><BR>"; 
+				echo "<font color=#e0e2e2><B>".$name."</B></font> (".$LogicalId.")  --- <font color=#8fc935><b>Ajoutée</b></font><BR>"; 
 
 				} else {
-				echo "<font color=#e0e2e2><B>".$CMDaCreerouModifierCorrigee."</B></font> --- <font color=#c0c0c0><b>Pas d'action</b></font> (existe déja)<BR>"; 
+				echo "<font color=#e0e2e2><B>".$name."</B></font> (".$LogicalId.")  --- <font color=#c0c0c0><b>Pas d'action</b></font> (existe déja)<BR>"; 
 				}
 				$cmd->save();
 

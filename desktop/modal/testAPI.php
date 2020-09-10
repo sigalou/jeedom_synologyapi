@@ -120,7 +120,7 @@ if ($obj_coreData['success']== true) {
 						//echo json_encode(jeeObject::fullData(), JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE, 1024);
 			// Faut chercher les commandes déja créées
 			foreach ($device->getCmd('info') as $cmd) {
-					array_push($listeExistent, $cmd->getName());
+					array_push($listeExistent, $cmd->getLogicalId());
 			}	
 		}
 
@@ -138,15 +138,15 @@ if ($obj_coreData['success']== true) {
 	echo '<br><input type="checkbox" onchange="actionCaseCocherTOUT(this)" ><FONT COLOR="#000000">Tout</font><br>';
 		$resultat=array();
 		foreach ($obj_coreData as $key => $value) {
-			$nom_Valeur1=$API.".".$key;
+			$nom_Valeur1=$API."|".$key;
 			if (is_array($value)) {
 				//echo "<br>c'est un array1";
 				if (empty($value)) {
 					//echo "vide";
 				} else {
 					foreach ($value as $key2 => $value2) {
-						$nom_Valeur2=$API."-".$key.".".$key2;
-						echo '<br><input type="checkbox" onchange="actionCaseCocher(this,`'.$nom_Valeur2.'`)" ><b>'.str_replace("SYNO.", "", $API)."-".$key.".".$key2."</b>";
+						$nom_Valeur2=$API."-".$key."|".$key2;
+						echo '<br><input type="checkbox" onchange="actionCaseCocher(this,`'.$nom_Valeur2.'`)" ><b>'.str_replace("SYNO.", "", $API)."-".$key."|".$key2."</b>";
 						if (is_array($value2)) {
 							//echo "<br>c'est un array2";
 							if (empty($value2)) {
@@ -154,28 +154,28 @@ if ($obj_coreData['success']== true) {
 							} else {
 								foreach ($value2 as $key3 => $value3) {
 									//echo "<br><br>1".$key3;
-									$nom_Valeur3=$API."-".$key.".".$key2.".".$key3;
+									$nom_Valeur3=$API."-".$key."|".$key2."|".$key3;
 									if (is_array($value3)) {
 										//echo "<br>c'est un array3";
 										if (empty($value3)) {
 											//echo "vide";
 										} else {
 											foreach ($value3 as $key4 => $value4) {
-												$nom_Valeur4=$API."-".$key.".".$key2.".".$key3.".".$key4;
+												$nom_Valeur4=$API."-".$key."|".$key2."|".$key3."|".$key4;
 												if (is_array($value4)) {
 													//echo "<br>c'est un array4";
 													if (empty($value4)) {
 														//echo "vide";
 													} else {
 														foreach ($value4 as $key5 => $value5) {
-															$nom_Valeur5=$API."-".$key.".".$key2.".".$key3.".".$key4.".".$key5;
+															$nom_Valeur5=$API."-".$key."|".$key2."|".$key3."|".$key4."|".$key5;
 															if (is_array($value5)) {
 																//echo "<br>c'est un array";
 																if (empty($value5)) {
 																	//echo "vide";
 																} else {
 																	foreach ($value5 as $key6 => $value6) {
-																		$nom_Valeur6=$API."-".$key.".".$key2.".".$key3.".".$key4.".".$key5.".".$key6;
+																		$nom_Valeur6=$API."-".$key."|".$key2."|".$key3."|".$key4."|".$key5."|".$key6;
 																		if (is_array($value6)) {
 																			//echo "<br>c'est un array";
 																			if (empty($value6)) {
