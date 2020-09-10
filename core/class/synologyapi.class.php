@@ -169,10 +169,10 @@ public static function update() {
 					$syntaxedeBase=$cmd->getConfiguration('requestAPI');
 					$nbdeNiveaux=mb_substr_count($syntaxedeBase, "|");
 					$parchamps = explode("|", $syntaxedeBase);
-					log::add('synologyapi', 'debug', '[syntaxedeBase] '.$syntaxedeBase);
-					log::add('synologyapi', 'debug', '[count] '.$nbdeNiveaux);
+					//log::add('synologyapi', 'debug', '[syntaxedeBase] '.$syntaxedeBase);
+					//log::add('synologyapi', 'debug', '[count] '.$nbdeNiveaux);
 					//log::add('synologyapi', 'debug', '[parchamps] '.$parchamps[1]);
-					log::add('synologyapi', 'debug', '[parchamps] '.json_encode($parchamps));
+					//log::add('synologyapi', 'debug', '[parchamps] '.json_encode($parchamps));
 					$value="rien";
 					switch ($nbdeNiveaux) {
 									case 0:

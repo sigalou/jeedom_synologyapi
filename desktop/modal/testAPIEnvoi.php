@@ -77,7 +77,22 @@ $eqLogics = synologyapi::byType('synologyapi');
 //echo json_encode($array); 
 foreach ($array as $value => $CMDaCreerouModifier)
 {
-    $CMDaCreerouModifierCorrigee=str_replace("SYNO.", "", str_replace($API."-", "", str_replace("@", ".", $CMDaCreerouModifier)));
+    
+	// On doit enlever SYNO. mais uniquement dans la partie du nom de l'API et non la partie du chemin vers la donnée
+	$partiedelAPI=substr($CMDaCreerouModifier, 0, strrpos($CMDaCreerouModifier, '-'));
+	$secondepartie=substr($CMDaCreerouModifier, 1+strrpos($CMDaCreerouModifier, '-'));
+	$CMDaCreerouModifierCorrigee=str_replace("@", ".", $secondepartie);
+	//$CMDaCreerouModifierCorrigee=str_replace("SYNO.", "", str_replace($API."-", "", str_replace("@", ".", $CMDaCreerouModifier)));
+	//echo "<br>tout:".$CMDaCreerouModifier;
+	//echo "<br>partiedelAPI:".$partiedelAPI;
+	//echo "<br>secondepartie:".$secondepartie;
+	//echo "<br>.";
+	
+	//echo "<br>AVANT:".$CMDaCreerouModifier;
+	//echo "<br>APRES:".$CMDaCreerouModifierCorrigee;
+	
+//test : ".substr($CMDaCreerouModifierCorrigee, 0,(strrpos($CMDaCreerouModifierCorrigee, '|'))); echo '<br />';
+
 	//echo $value; echo '-';
 //echo "CMD : ".$CMDaCreerouModifierCorrigee; echo '<br />';
 //$test=$CMDaCreerouModifierCorrigee."|truc|machin";
