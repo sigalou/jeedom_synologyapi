@@ -135,7 +135,7 @@ if ($obj_coreData['success']== true) {
 	echo '<input id="md5" name="md5" type="hidden" value="'.$md5.'">';
 	echo '<input id="IdSyno" name="IdSyno" type="hidden" value="'.$idsynology.'">';
 	echo '<input id="parametresAPI" name="parametresAPI" type="hidden" value="'.str_replace("v=d&plugin=synologyapi&modal=testAPI&", "", $parametresAPI).'">'; 
-	echo '<br><input type="checkbox" onchange="actionCaseCocherTOUT(this)" ><FONT COLOR="#000000">Tout</font><br>';
+	echo '<br><input type="checkbox" onchange="actionCaseCocherTOUT(this)" ><FONT COLOR="#000000">Tout</font> <B>'.str_replace("SYNO.", "", $API).'</B><br>';
 		$resultat=array();
 		foreach ($obj_coreData as $key => $value) {
 			$nom_Valeur1=$API."|".$key;
@@ -146,7 +146,7 @@ if ($obj_coreData['success']== true) {
 				} else {
 					foreach ($value as $key2 => $value2) {
 						$nom_Valeur2=$API."-".$key."|".$key2;
-						echo '<br><input type="checkbox" onchange="actionCaseCocher(this,`'.$nom_Valeur2.'`)" ><b>'.str_replace("SYNO.", "", $API)."-".$key."|".$key2."</b>";
+						echo '<br><input type="checkbox" onchange="actionCaseCocher(this,`'.$nom_Valeur2.'`)" ><b>'.$key2."</b>";
 						if (is_array($value2)) {
 							//echo "<br>c'est un array2";
 							if (empty($value2)) {
@@ -155,6 +155,7 @@ if ($obj_coreData['success']== true) {
 								foreach ($value2 as $key3 => $value3) {
 									//echo "<br><br>1".$key3;
 									$nom_Valeur3=$API."-".$key."|".$key2."|".$key3;
+									$nom_Valeur3_courte=$key2."|".$key3;
 									if (is_array($value3)) {
 										//echo "<br>c'est un array3";
 										if (empty($value3)) {
@@ -187,7 +188,7 @@ if ($obj_coreData['success']== true) {
 																			else {
 																			echo '<li><input type="checkbox" ';
 																			if (array_search ( str_replace($API."-", "", $nom_Valeur6) , $listeExistent)!== false) echo " checked ";
-																			echo 'id="'.$nom_Valeur2.'" name="'.str_replace(".", "@", $nom_Valeur6).'"><FONT COLOR="#e0e2e2">'.str_replace("SYNO.", "", $nom_Valeur6).'</FONT> : <FONT COLOR="#ffed4a"><B>'.$value6.'</B></FONT></li>';
+																			echo 'id="'.$nom_Valeur2.'" name="'.str_replace(".", "@", $nom_Valeur6).'"><FONT COLOR="#e0e2e2">'.str_replace("_", " ", $key6).'</FONT> : <FONT COLOR="#ffed4a"><B>'.$value6.'</B></FONT></li>';
 																			$resultat[$nom_Valeur6] = $value6;
 																			}
 																	}
@@ -196,7 +197,7 @@ if ($obj_coreData['success']== true) {
 																else {
 																echo '<li><input type="checkbox" ';
 																if (array_search ( str_replace($API."-", "", $nom_Valeur5) , $listeExistent)!== false) echo " checked ";
-																echo 'id="'.$nom_Valeur2.'" name="'.str_replace(".", "@", $nom_Valeur5).'"><FONT COLOR="#e0e2e2">'.str_replace("SYNO.", "", $nom_Valeur5).'</FONT> : <FONT COLOR="#ffed4a"><B>'.$value5.'</B></FONT></li>';
+																echo 'id="'.$nom_Valeur2.'" name="'.str_replace(".", "@", $nom_Valeur5).'"><FONT COLOR="#e0e2e2">'.str_replace("_", " ", $key5).'</FONT> : <FONT COLOR="#ffed4a"><B>'.$value5.'</B></FONT></li>';
 																$resultat[$nom_Valeur5] = $value5;
 																}
 														}
@@ -206,7 +207,7 @@ if ($obj_coreData['success']== true) {
 													else {
 												echo '<li><input type="checkbox" ';
 												if (array_search ( str_replace($API."-", "", $nom_Valeur4) , $listeExistent)!== false) echo " checked ";
-												echo 'id="'.$nom_Valeur2.'" name="'.str_replace(".", "@", $nom_Valeur4).'"><FONT COLOR="#e0e2e2">'.str_replace("SYNO.", "", $nom_Valeur4).'</FONT> : <FONT COLOR="#ffed4a"><B>'.$value4.'</B></FONT></li>';												
+												echo 'id="'.$nom_Valeur2.'" name="'.str_replace(".", "@", $nom_Valeur4).'"><FONT COLOR="#e0e2e2">'.str_replace("_", " ", $key4).'</FONT> : <FONT COLOR="#ffed4a"><B>'.$value4.'</B></FONT></li>';												
 												$resultat[$nom_Valeur4] = $value4;
 													}
 											}
@@ -215,7 +216,7 @@ if ($obj_coreData['success']== true) {
 										else {
 										echo '<li><input type="checkbox" ';
 										if (array_search ( str_replace($API."-", "", $nom_Valeur3) , $listeExistent)!== false) echo " checked ";
-										echo 'id="'.$nom_Valeur2.'" name="'.str_replace(".", "@", $nom_Valeur3).'"><FONT COLOR="#e0e2e2">'.str_replace("SYNO.", "", $nom_Valeur3).'</FONT> : <FONT COLOR="#ffed4a"><B>'.$value3.'</B></FONT></li>';
+										echo 'id="'.$nom_Valeur2.'" name="'.str_replace(".", "@", $nom_Valeur3).'"><FONT COLOR="#e0e2e2">'.str_replace("_", " ", $key3).'</FONT> : <FONT COLOR="#ffed4a"><B>'.$value3.'</B></FONT></li>';
 										$resultat[$nom_Valeur3] = $value3;
 										}
 								}
@@ -224,7 +225,7 @@ if ($obj_coreData['success']== true) {
 							else {
 							echo '<li><input type="checkbox" ';
 							if (array_search ( str_replace($API."-", "", $nom_Valeur2) , $listeExistent)!== false) echo " checked ";
-							echo 'id="'.$nom_Valeur2.'" name="'.str_replace(".", "@", $nom_Valeur2).'"><FONT COLOR="#e0e2e2">'.str_replace("SYNO.", "", $nom_Valeur2).'</FONT> : <FONT COLOR="#ffed4a"><B>'.$value2.'</B></FONT></li>';
+							echo 'id="'.$nom_Valeur2.'" name="'.str_replace(".", "@", $nom_Valeur2).'"><FONT COLOR="#e0e2e2">'.str_replace("_", " ", $key2).'</FONT> : <FONT COLOR="#ffed4a"><B>'.$value2.'</B></FONT></li>';
 							$resultat[$nom_Valeur2] = $value2;
 							}
 					}

@@ -25,13 +25,12 @@ $('#bt_req').off('click').on('click', function () {
 });
 
 function ouvreModalavecAPI() {
-  //console.log($('.eqLogicAttr[data-l1key=configuration][data-l2key=urlAPI]').value());
 
   $('#md_modal').dialog({
     title: "{{Assistant API}}"
   });
 //  $('#md_modal').load('index.php?v=d&plugin=synologyapi&modal=req&&idsynology=1&iddevice=' + $('.eqLogicAttr[data-l1key=logicalId]').value()).dialog('open');
-  $('#md_modal').load('index.php?v=d&plugin=synologyapi&modal=req&source=device'+$('.eqLogicAttr[data-l1key=configuration][data-l2key=urlAPI]').value().replace('?', '&')).dialog('open');
+  $('#md_modal').load('index.php?v=d&plugin=synologyapi&modal=req&zzz=aaa&source=device'+$('.eqLogicAttr[data-l1key=configuration][data-l2key=urlAPI]').value().replace('?', '&')).dialog('open');
 }
 
 $("#table_cmd").sortable({axis: "y", cursor: "move", items: ".cmd", placeholder: "ui-state-highlight", tolerance: "intersect", forcePlaceholderSize: true});

@@ -18,7 +18,26 @@
 if (!isConnect('admin')) {
   throw new Exception('{{401 - Accès non autorisé}}');
 }
-$arrayURL=getURI();
+
+    $adresse = "";//$_SERVER['PHP_SELF'];
+	$arrayURL=array();
+	$URLparametres=""; // c'est ce qui suit method
+	$NousSommesApresMethod=false;
+    $i = 0;
+   foreach($_GET as $cle => $valeur){
+		$cle=str_replace("amp;", "", $cle); // rustine pour corriger la transformation de & en &amp;
+		//echo "<br>>>".$cle."-----".$valeur;
+		$arrayURL[$cle]=$valeur;
+        $adresse .= ($i == 0 ? '?' : '&').$cle.($valeur ? '='.$valeur : '');
+		if ($NousSommesApresMethod) $URLparametres="&".$cle.($valeur ? '='.$valeur : '');
+		if ($cle=="method") $NousSommesApresMethod=true;
+        $i++;
+    }
+
+//$arrayURL=getURI();
+//echo json_encode($arrayURL);
+//echo "<br>URLparametres:".$URLparametres;
+
 $idsynology=$arrayURL['idsynology'];
 $source=$arrayURL['source'];
 if ($idsynology == "2") {
@@ -40,7 +59,7 @@ else {
 	$nomSynology = config::byKey('Syno1_name','synologyapi');
 	}
 //$arrayGET=$_GET;
-//echo json_encode($arrayGET);
+//echo json_encode($_GET);
 /*
 echo'<br>';
 foreach ($arrayGET as $cle => &$str) {
@@ -49,19 +68,7 @@ foreach ($arrayGET as $cle => &$str) {
 }*/
 //echo json_encode($arrayGET);
 //echo'<br>';
-function getURI(){
-    $adresse = "";$_SERVER['PHP_SELF'];
-	$arrayURL=array();
-    $i = 0;
-    foreach($_GET as $cle => $valeur){
-		$cle=str_replace("amp;", "", $cle); // rustine pour corriger la transformation de & en &amp;
-		//echo "<br>>>".."-----".;
-		$arrayURL[$cle]=$valeur;
-        $adresse .= ($i == 0 ? '?' : '&').$cle.($valeur ? '='.$valeur : '');
-        $i++;
-    }
-    return $arrayURL;
-}
+
 
 $hauteuriFrame="100%";
 if ($source!="device") {
@@ -188,7 +195,7 @@ window.closeModal = function(){
 <iframe id="moniframe" name="frame1"
     width="100%"
     height="<?php echo $hauteuriFrame?>"
-    src="index.php?v=d&plugin=synologyapi&modal=testAPI&idsynology=<?php echo $arrayURL['idsynology']?>&api=<?php echo $arrayURL['api']?>&method=<?php echo $arrayURL['method'].$arrayURL['plus']?>">
+    src="index.php?v=d&plugin=synologyapi&modal=testAPI&idsynology=<?php echo $arrayURL['idsynology']?>&api=<?php echo $arrayURL['api']?>&method=<?php echo $arrayURL['method'].$URLparametres?>">
 </iframe>
 
 
