@@ -276,6 +276,7 @@ else 	{
 
 
 //SECURITY Logout and destroying SID
+/*
 $json_logout = file_get_contents($server.'/webapi/'.$path.'?api=SYNO.API.Auth&method=logout&version='.$vAuth.'&_sid='.$sid, false, stream_context_create($arrContextOptions));
 $obj_logout = json_decode($json_logout);	
 if($obj_logout->success == 1){
@@ -283,7 +284,7 @@ if($obj_logout->success == 1){
 } else {
 	echo '<br>Logout FAILED : please check code due to security issues!';
 }	
-
+*/
 //require_once('request.SYNO.Logout.php');  
 ?>
 <?php include_file('desktop', 'synologyapi', 'css', 'synologyapi'); ?>
