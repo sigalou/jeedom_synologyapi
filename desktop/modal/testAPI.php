@@ -1,11 +1,12 @@
 <body style="background-color:#646464;">
 <FONT COLOR="#000000">
-
 <?php 
 
 if (!isConnect('admin')) {
   throw new Exception('{{401 - Accès non autorisé}}');
 }
+//include_file('desktop', 'bootstrap/css/bootstrap-theme', 'css');
+
 
 //$API="SYNO.Core.System.Utilization";
 //$method="get";
@@ -78,15 +79,16 @@ function actionCaseCocher(laCase, API) {
 		//console.log("oui");
   		for (var i = 0; i < cases.length; i++) {
 		console.log("------------------------------------");
-		console.log(cases[i].name+" - "+API);
-		 if ((cases[i].type == 'checkbox') && (cases[i].id == API)) {
+		//console.log(substr(cases[i].id,0,strlen(API)+" - "+API);
+		//console.log(cases[i].id+" - "+API);
+		 if ((cases[i].type == 'checkbox') && (cases[i].id.substring(0,API.length)== API)) {
 			 cases[i].checked = true;
 		 }
 		}
 	} else {
   //console.log("non");
   		for (var i = 0; i < cases.length; i++) {
-		 if ((cases[i].type == 'checkbox') && (cases[i].id == API)) {
+		 if ((cases[i].type == 'checkbox') && (cases[i].id.substring(0,API.length)== API)) {
 			 cases[i].checked = false;
 		 }
 		}
@@ -111,31 +113,31 @@ if ($obj_coreData['success']== true) {
 		$eqLogics = synologyapi::byType('synologyapi');
 		$device = synologyapi::byLogicalId($md5, 'synologyapi');
 		$listeExistent=array();
-		if (!is_object($device)) {
-			$couleurBoutonAjouteModifAPI="ffffff";
-			$texteBoutonAjouteModifAPI="Ajouter";
-		} else {
-			$couleurBoutonAjouteModifAPI="ffaf47";
-			$texteBoutonAjouteModifAPI="Modifier";
-						//echo json_encode(jeeObject::fullData(), JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE, 1024);
+		if (is_object($device)) {
 			// Faut chercher les commandes déja créées
 			foreach ($device->getCmd('info') as $cmd) {
 					array_push($listeExistent, $cmd->getLogicalId());
 			}	
 		}
+//calage checkbox indéterminé : https://mdbootstrap.com/docs/jquery/forms/checkbox/
 
-
-	echo "<table border=0 width=100%><tr><td width=50%><b>Consignes</b> :
-	<br>1. Cocher ci-dessous les informations que vous souhaitez utiliser dans Jeedom
-	<br>2. Cliquer sur le bouton ".$texteBoutonAjouteModifAPI." cette API </td><td width=50%><br><input type='submit' style='background-color:#539f53;font-size:120%;width: 400;border: 0px;padding: 12px 12px;color:#".$couleurBoutonAjouteModifAPI.";' value='".$texteBoutonAjouteModifAPI." cette API'>";
-	echo "</td></tr></table>";
 		
 	// <form action="/action_page.php" method="get"> 
 	echo '<br><input id="API" name="API" type="hidden" value="'.$API.'">';
 	echo '<input id="md5" name="md5" type="hidden" value="'.$md5.'">';
 	echo '<input id="IdSyno" name="IdSyno" type="hidden" value="'.$idsynology.'">';
 	echo '<input id="parametresAPI" name="parametresAPI" type="hidden" value="'.str_replace("v=d&plugin=synologyapi&modal=testAPI&", "", $parametresAPI).'">'; 
-	echo '<br><input type="checkbox" onchange="actionCaseCocherTOUT(this)" ><FONT COLOR="#000000">Tout</font> <B>'.str_replace("SYNO.", "", $API).'</B><br>';
+	echo '
+
+<div class="card">
+  <div class="card-header"><table border=0 width=100%><tr><td>
+					<h5 class="card-title">
+					<input style="position: relative;left:150px;" type="checkbox" class="custom-control-input" id="tout" onchange="actionCaseCocherTOUT(this)" >
+					<label class="custom-control-label" for="tout"></label><B>'.str_replace("SYNO.", "", $API).'</B></h5></td><td align=right>
+					<input type="submit" style="background-color:#67b367;width: 200;border: 0px;padding: 12px 12px;color:#efefef"  value="Sauvegarder"></td></TR></table>
+				</div>
+  <div class="card-body">				
+';
 		$resultat=array();
 		foreach ($obj_coreData as $key => $value) {
 			$nom_Valeur1=$API."|".$key;
@@ -146,7 +148,16 @@ if ($obj_coreData['success']== true) {
 				} else {
 					foreach ($value as $key2 => $value2) {
 						$nom_Valeur2=$API."-".$key."|".$key2;
-						echo '<br><input type="checkbox" onchange="actionCaseCocher(this,`'.$nom_Valeur2.'`)" ><b>'.$key2."</b>";
+						echo '<br>
+<div class="card">
+  <div class="card-header"><h5 class="card-title">
+					<input style="position: relative;left:150px;" type="checkbox" class="custom-control-input" id="'.$key2.'" onchange="actionCaseCocher(this,`'.$nom_Valeur2.'`)" >
+					<label class="custom-control-label" for="'.$key2.'">'.$key2.'</label></h5>
+				</div>
+  <div class="card-body">
+
+
+			';
 						if (is_array($value2)) {
 							//echo "<br>c'est un array2";
 							if (empty($value2)) {
@@ -185,49 +196,26 @@ if ($obj_coreData['success']== true) {
 																				echo "pasvide!!!!!!!!!!!!!!!!!!!!!!!!!!";
 																			}
 																		}
-																			else {
-																			echo '<li><input type="checkbox" ';
-																			if (array_search ( str_replace($API."-", "", $nom_Valeur6) , $listeExistent)!== false) echo " checked ";
-																			echo 'id="'.$nom_Valeur2.'" name="'.str_replace(".", "@", $nom_Valeur6).'"><FONT COLOR="#e0e2e2">'.str_replace("_", " ", $key6).'</FONT> : <FONT COLOR="#ffed4a"><B>'.$value6.'</B></FONT></li>';
-																			$resultat[$nom_Valeur6] = $value6;
-																			}
+																	else afficheSectionaCocher ($API, $key6, $nom_Valeur6, $value6, $listeExistent);
 																	}
 																}
 															}
-																else {
-																echo '<li><input type="checkbox" ';
-																if (array_search ( str_replace($API."-", "", $nom_Valeur5) , $listeExistent)!== false) echo " checked ";
-																echo 'id="'.$nom_Valeur2.'" name="'.str_replace(".", "@", $nom_Valeur5).'"><FONT COLOR="#e0e2e2">'.str_replace("_", " ", $key5).'</FONT> : <FONT COLOR="#ffed4a"><B>'.$value5.'</B></FONT></li>';
-																$resultat[$nom_Valeur5] = $value5;
-																}
+															else afficheSectionaCocher ($API, $key5, $nom_Valeur5, $value5, $listeExistent);
 														}
 														
 													}
 												}
-													else {
-												echo '<li><input type="checkbox" ';
-												if (array_search ( str_replace($API."-", "", $nom_Valeur4) , $listeExistent)!== false) echo " checked ";
-												echo 'id="'.$nom_Valeur2.'" name="'.str_replace(".", "@", $nom_Valeur4).'"><FONT COLOR="#e0e2e2">'.str_replace("_", " ", $key4).'</FONT> : <FONT COLOR="#ffed4a"><B>'.$value4.'</B></FONT></li>';												
-												$resultat[$nom_Valeur4] = $value4;
-													}
+													else afficheSectionaCocher ($API, $key4, $nom_Valeur4, $value4, $listeExistent);
 											}
 										}
 									}
-										else {
-										echo '<li><input type="checkbox" ';
-										if (array_search ( str_replace($API."-", "", $nom_Valeur3) , $listeExistent)!== false) echo " checked ";
-										echo 'id="'.$nom_Valeur2.'" name="'.str_replace(".", "@", $nom_Valeur3).'"><FONT COLOR="#e0e2e2">'.str_replace("_", " ", $key3).'</FONT> : <FONT COLOR="#ffed4a"><B>'.$value3.'</B></FONT></li>';
-										$resultat[$nom_Valeur3] = $value3;
-										}
+										else afficheSectionaCocher ($API, $key3, $nom_Valeur3, $value3, $listeExistent);
 								}
 							}
 						}
-							else {
-							echo '<li><input type="checkbox" ';
-							if (array_search ( str_replace($API."-", "", $nom_Valeur2) , $listeExistent)!== false) echo " checked ";
-							echo 'id="'.$nom_Valeur2.'" name="'.str_replace(".", "@", $nom_Valeur2).'"><FONT COLOR="#e0e2e2">'.str_replace("_", " ", $key2).'</FONT> : <FONT COLOR="#ffed4a"><B>'.$value2.'</B></FONT></li>';
-							$resultat[$nom_Valeur2] = $value2;
-							}
+							else afficheSectionaCocher ($API, $key2, $nom_Valeur2, $value2, $listeExistent);
+							echo '  </div>
+								</div>';
 					}
 				}
 			}
@@ -273,7 +261,15 @@ else 	{
 	return $resultat;
 }
 	
-
+function afficheSectionaCocher ($API, $keyX, $nom_ValeurX, $valueX, $listeExistent)
+{
+	echo '<div class="custom-control custom-checkbox">
+	<input type="checkbox" ';
+	if (array_search ( str_replace($API."-", "", $nom_ValeurX) , $listeExistent)!== false) echo ' checked="" ';
+	echo ' class="custom-control-input" id='.$nom_ValeurX.' name="'.str_replace(".", "@", $nom_ValeurX).'">
+	<label class="custom-control-label" for="'.$nom_ValeurX.'">'.str_replace("_", " ", $keyX).'</label> : <FONT COLOR="#007bff">'.$valueX.'</FONT>
+	</div>';
+}
 
 //SECURITY Logout and destroying SID
 /*
@@ -288,3 +284,5 @@ if($obj_logout->success == 1){
 //require_once('request.SYNO.Logout.php');  
 ?>
 <?php include_file('desktop', 'synologyapi', 'css', 'synologyapi'); ?>
+<?php include_file('desktop', 'bootstrap/bootstrap', 'css', 'synologyapi'); ?>
+<?php include_file('core', 'plugin.template', 'js');?>

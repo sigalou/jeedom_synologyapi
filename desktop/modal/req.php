@@ -215,4 +215,3 @@ window.closeModal = function(){
 <?php 
 }
 include_file('desktop', 'synologyapi', 'js', 'synologyapi'); ?>
-<?php include_file('desktop', 'synologyapi', 'css', 'synologyapi'); ?>
