@@ -133,7 +133,7 @@ if ($obj_coreData['success']== true) {
   <div class="card-header" style="background-color:#454648"><table border=0 width=100%><tr><td>
 					<h5 class="card-title">
 					<input style="position: relative;left:150px;" type="checkbox" class="custom-control-input" id="tout" onchange="actionCaseCocherTOUT(this)" >
-					<label class="custom-control-label" for="tout"></label><B>'.str_replace("SYNO.", "", $API).'</B></h5></td><td align=right>
+					<label style="color:#ffffff;" class="custom-control-label" for="tout"><B>'.str_replace("SYNO.", "", $API).'</B></label></h5></td><td align=right>
 					<input type="submit" style="background-color:#67b367;width: 200;border: 0px;padding: 12px 12px;color:#efefef"  value="Sauvegarder"></td></TR></table>
 				</div>
   <div class="card-body"  style="background-color:#727272">				
@@ -152,7 +152,7 @@ if ($obj_coreData['success']== true) {
 <div class="card">
   <div class="card-header" style="background-color:#454648"><h5 class="card-title">
 					<input style="position: relative;left:150px;" type="checkbox" class="custom-control-input" id="'.$key2.'" onchange="actionCaseCocher(this,`'.$nom_Valeur2.'`)" >
-					<label class="custom-control-label" for="'.$key2.'">'.$key2.'</label></h5>
+					<label style="color:#ffffff;" class="custom-control-label" for="'.$key2.'">'.$key2.'</label></h5>
 				</div>
   <div class="card-body" style="background-color:#646464">
 
