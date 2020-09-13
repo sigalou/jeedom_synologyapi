@@ -130,13 +130,13 @@ if ($obj_coreData['success']== true) {
 	echo '
 
 <div class="card">
-  <div class="card-header"><table border=0 width=100%><tr><td>
+  <div class="card-header" style="background-color:#454648"><table border=0 width=100%><tr><td>
 					<h5 class="card-title">
 					<input style="position: relative;left:150px;" type="checkbox" class="custom-control-input" id="tout" onchange="actionCaseCocherTOUT(this)" >
 					<label class="custom-control-label" for="tout"></label><B>'.str_replace("SYNO.", "", $API).'</B></h5></td><td align=right>
 					<input type="submit" style="background-color:#67b367;width: 200;border: 0px;padding: 12px 12px;color:#efefef"  value="Sauvegarder"></td></TR></table>
 				</div>
-  <div class="card-body">				
+  <div class="card-body"  style="background-color:#727272">				
 ';
 		$resultat=array();
 		foreach ($obj_coreData as $key => $value) {
@@ -150,11 +150,11 @@ if ($obj_coreData['success']== true) {
 						$nom_Valeur2=$API."-".$key."|".$key2;
 						echo '<br>
 <div class="card">
-  <div class="card-header"><h5 class="card-title">
+  <div class="card-header" style="background-color:#454648"><h5 class="card-title">
 					<input style="position: relative;left:150px;" type="checkbox" class="custom-control-input" id="'.$key2.'" onchange="actionCaseCocher(this,`'.$nom_Valeur2.'`)" >
 					<label class="custom-control-label" for="'.$key2.'">'.$key2.'</label></h5>
 				</div>
-  <div class="card-body">
+  <div class="card-body" style="background-color:#646464">
 
 
 			';
@@ -263,11 +263,13 @@ else 	{
 	
 function afficheSectionaCocher ($API, $keyX, $nom_ValeurX, $valueX, $listeExistent)
 {
+	if ($valueX === false ) $valueX="false";
+	if ($valueX === true  ) $valueX="true";
 	echo '<div class="custom-control custom-checkbox">
 	<input type="checkbox" ';
 	if (array_search ( str_replace($API."-", "", $nom_ValeurX) , $listeExistent)!== false) echo ' checked="" ';
 	echo ' class="custom-control-input" id='.$nom_ValeurX.' name="'.str_replace(".", "@", $nom_ValeurX).'">
-	<label class="custom-control-label" for="'.$nom_ValeurX.'">'.str_replace("_", " ", $keyX).'</label> : <FONT COLOR="#007bff">'.$valueX.'</FONT>
+	<label class="custom-control-label" for="'.$nom_ValeurX.'">'.str_replace("_", " ", $keyX).'</label> : <FONT COLOR="#cdcdcd">'.$valueX.'</FONT>
 	</div>';
 }
 
@@ -284,5 +286,5 @@ if($obj_logout->success == 1){
 //require_once('request.SYNO.Logout.php');  
 ?>
 <?php include_file('desktop', 'synologyapi', 'css', 'synologyapi'); ?>
-<?php include_file('desktop', 'bootstrap/bootstrap', 'css', 'synologyapi'); ?>
+<?php include_file('desktop', 'bootstrap/bootstrap.min', 'css', 'synologyapi'); ?>
 <?php include_file('core', 'plugin.template', 'js');?>

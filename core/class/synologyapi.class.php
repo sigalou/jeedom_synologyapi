@@ -201,6 +201,9 @@ public static function update() {
 															[$parchamps[4]];
 										break;
 								}
+					if ($value === false ) $value="false";
+					if ($value === true  ) $value="true";
+					//log::add('synologyapi', 'debug', '[value] '.$value);
 					
 					log::add('synologyapi', 'info', " ╠═ ".$cmd->getName()." = ".$value);
 

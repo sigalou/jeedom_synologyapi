@@ -19,6 +19,9 @@ if (!isConnect('admin')) {
   throw new Exception('{{401 - Accès non autorisé}}');
 }
 
+///$return = jeedom::getThemeConfig();
+//echo $return['current_desktop_theme'];
+
     $adresse = "";//$_SERVER['PHP_SELF'];
 	$arrayURL=array();
 	$URLparametres=""; // c'est ce qui suit method
