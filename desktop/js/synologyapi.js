@@ -24,6 +24,32 @@ $('#bt_req').off('click').on('click', function () {
   $('#md_modal').load('index.php?v=d&plugin=synologyapi&modal=req&idsynology=1&api=SYNO.Core.System.Utilization&method=get').dialog('open');
 });
 
+// On passe d'un device All à un device Syno
+function typeChange(){
+	console.log ("changement2");
+	if ($('#typefield').value() == 'all') {
+    $('#OngletListeAPI').show();
+    $('#OngletCommandes').hide();
+    $('#OngletEquipement').hide();
+    $('#EcranEquipement').hide();
+    $('#EcranListeAPI').show();
+	console.log ("changement3");
+  }
+  else {
+    $('#OngletListeAPI').hide();
+    $('#OngletCommandes').show();
+    $('#OngletEquipement').show();
+    $('#EcranEquipement').show();
+    $('#EcranListeAPI').hide();
+	console.log ("changement4");
+  }
+}
+$( "#typefield" ).change(function(){
+	console.log ("changement");
+  setTimeout(typeChange,100);
+});
+
+
 function ouvreModalavecAPI() {
 
   $('#md_modal').dialog({
@@ -135,6 +161,10 @@ $('#table_cmd tbody').delegate('tr .remove', 'click', function (event) {
   $(this).closest('tr').remove();
 });
 
+$('#table_API tbody').delegate('tr .remove', 'click', function (event) {
+  $(this).closest('tr').remove();
+});
+
 $("#table_cmd").delegate(".listEquipementInfo", 'click', function () {
   var el = $(this);
   jeedom.cmd.getSelectModal({cmd: {type: 'info'}}, function (result) {
@@ -142,6 +172,7 @@ $("#table_cmd").delegate(".listEquipementInfo", 'click', function () {
     calcul.atCaret('insert', result.human);
   });
 });
+
 
 $("#table_cmd").delegate(".listEquipementAction", 'click', function () {
   var el = $(this);
@@ -153,6 +184,8 @@ $("#table_cmd").delegate(".listEquipementAction", 'click', function () {
 });
 
 $("#table_cmd").sortable({axis: "y", cursor: "move", items: ".cmd", placeholder: "ui-state-highlight", tolerance: "intersect", forcePlaceholderSize: true});
+
+$("#table_API").sortable({axis: "y", cursor: "move", items: ".cmd", placeholder: "ui-state-highlight", tolerance: "intersect", forcePlaceholderSize: true});
 
 function addCmdToTable(_cmd) {
   if (!isset(_cmd)) {
@@ -184,21 +217,6 @@ function addCmdToTable(_cmd) {
     if (init(_cmd.logicalId) == "refresh")
       tr += ' style="display:none;" ';
     tr += ' data-l1key="configuration" data-l2key="requestAPI">';
-
-   /* tr += '<td>';
-
-      tr += '<textarea class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="requestAPI" style="height : 33px;"></textarea>';
-
-
-    tr += '</td>';
-    
-    tr += '<td>';
-   // tr += '<input class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="returnStateValue" placeholder="{{Valeur retour d\'état}}" style="width:48%;display:inline-block;">';
-  //  tr += '<input class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="returnStateTime" placeholder="{{Durée avant retour d\'état (min)}}" style="width:48%;display:inline-block;margin-left:2px;">';
-    tr += '<select class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="updateCmdId" style="display : none;" title="Commande d\'information à mettre à jour">';
-    tr += '<option value="">Aucune</option>';
-    tr += '</select>';
-    tr += '</td>';*/
     tr += '<td>';
     tr += '<input class="tooltips cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="minValue" placeholder="{{Min}}" title="{{Min}}" style="width:30%;display:inline-block;">';
     tr += '<input class="tooltips cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="maxValue" placeholder="{{Max}}" title="{{Max}}" style="width:30%;display:inline-block;">';
@@ -223,6 +241,47 @@ function addCmdToTable(_cmd) {
     }
     jeedom.cmd.changeType($('#table_cmd tbody tr').last(), init(_cmd.subType));
   }
+  
+   if (init(_cmd.type) == 'API') {
+    var tr = '<tr class="cmd" data-cmd_id="' + init(_cmd.id) + '" virtualAction="' + init(_cmd.configuration.virtualAction) + '">';
+    //tr += '<td>';
+  //  tr += '<small><small><span class="cmdAttr" data-l1key="id"></span></small></small>';
+   // tr += '</td>';
+    tr += '<td>';
+    tr += '<input class="cmdAttr form-control input-sm" data-l1key="name" style="width : 80%;" placeholder="{{Nom}}"></td>';
+	/*    tr += '<td>1' +
+      '<input class="cmdAttr form-control input-sm"';
+    if (init(_cmd.logicalId) != "")
+      tr += 'readonly';
+
+    if (init(_cmd.logicalId) == "refresh")
+      tr += ' style="display:none;" ';
+    tr += ' data-l1key="configuration" data-l2key="requestAPI">';
+    tr += '<td>2';
+    tr += '<input class="tooltips cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="minValue" placeholder="{{Min}}" title="{{Min}}" style="width:30%;display:inline-block;">';
+    tr += '<input class="tooltips cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="maxValue" placeholder="{{Max}}" title="{{Max}}" style="width:30%;display:inline-block;">';
+    tr += '<input class="cmdAttr form-control input-sm" data-l1key="unite" placeholder="Unité" title="{{Unité}}" style="width:30%;display:inline-block;margin-right:5px;">';
+    tr += '<input class="tooltips cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="listValue" placeholder="{{Liste de valeur|texte séparé par ;}}" title="{{Liste}}">';
+    tr += '<span><label class="checkbox-inline"><input type="checkbox" class="cmdAttr checkbox-inline" data-l1key="isVisible" checked/>{{Afficher}}</label></span> ';
+    tr += '<span><label class="checkbox-inline"><input type="checkbox" class="cmdAttr checkbox-inline" data-l1key="isHistorized" checked/>{{Historiser}}</label></span> ';
+    tr += '<span><label class="checkbox-inline"><input type="checkbox" class="cmdAttr" data-l1key="display" data-l2key="invertBinary"/>{{Inverser}}</label></span> ';
+    tr += '</td>';
+    
+    tr += '<td>3';
+    if (is_numeric(_cmd.id)) {
+      tr += '<a class="btn btn-default btn-xs cmdAction" data-action="configure"><i class="fas fa-cogs"></i></a> ';
+      tr += '<a class="btn btn-default btn-xs cmdAction" data-action="test"><i class="fas fa-rss"></i> {{Tester}}</a>';
+    }
+    tr += '<i class="fas fa-minus-circle pull-right cmdAction cursor" data-action="remove"></i></td>';*/
+    tr += '</tr>';
+    $('#table_API tbody').append(tr);
+    $('#table_API tbody tr').last().setValues(_cmd, '.cmdAttr');
+    if (isset(_cmd.type)) {
+      $('#table_API tbody tr:last .cmdAttr[data-l1key=type]').value(init(_cmd.type));
+    }
+    jeedom.cmd.changeType($('#table_API tbody tr').last(), init(_cmd.subType));
+  } 
+ 
   
   if (init(_cmd.type) == 'action') {
     var tr = '<tr class="cmd" data-cmd_id="' + init(_cmd.id) + '">';

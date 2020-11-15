@@ -144,6 +144,7 @@ $name=str_replace("|", ":", $name); //On remplace | par : pour le nom de la comm
 		$newDevice->setConfiguration('device', $deviceName);
 		$newDevice->setConfiguration('serial', $deviceSerial);
 		$newDevice->setConfiguration('autorefresh', '* * * * *');
+		$newDevice->setConfiguration('type', "syno"); // all = toutes les api // syno=un device syno
 		$newDevice->setIsEnable(1);
 		return $newDevice;
 	}
