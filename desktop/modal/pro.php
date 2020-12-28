@@ -18,6 +18,7 @@
 if (!isConnect('admin')) {
   throw new Exception('{{401 - Accès non autorisé}}');
 }
+echo "Lancement Modal Pro";
 
 	function createNewDevice($deviceName, $idSyno)
 	{

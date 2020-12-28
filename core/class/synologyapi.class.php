@@ -259,7 +259,7 @@ $arrContextOptions=array(
 		);
 
 		//Get SYNO.API.Auth Path (recommended by Synology for further update) and maxVersion
-		// https://192.168.0.1:1976/webapi/query.cgi?api=SYNO.API.Info&version=1&method=query&query=SYNO.API.Auth
+		// https://192.168.1.1:1976/webapi/query.cgi?api=SYNO.API.Info&version=1&method=query&query=SYNO.API.Auth
 		$begin_time = array_sum(explode(' ', microtime()));
 		$json = file_get_contents($server.'/webapi/query.cgi?api=SYNO.API.Info&version=1&method=query&query=SYNO.API.Auth', false, stream_context_create($arrContextOptions));
 		$end_time = array_sum(explode(' ', microtime()));
@@ -287,7 +287,7 @@ $arrContextOptions=array(
 
 	public function recupereDonneesJson ($sid,$API,$parametresAPI,$parameters,$idsynology)
 	{
-	//log::add('synologyapi', 'debug', 'lancement  recupereDonneesJson '.$API);
+	log::add('synologyapi', 'debug', 'lancement  recupereDonneesJson '.$API);
 
 	//echo "<br><b>MD5</b> : ".$md5."<hr>"; 
 	//Define ssl arguments
@@ -349,11 +349,17 @@ $arrContextOptions=array(
 
 		//echo $server.'/webapi/'.$path_core.'?api=SYNO.Core.System.Utilization&version='.$vCore.'&method=get&type=current&_sid='.$sid;
 
-		 
+
+//Activer wifi           	&config=%7B%22enabled%22%3Atrue%7D&netif=smartconnect
+//Desactiver Wifi 			&config=%7B%22enabled%22%3Afalse%7D&netif=smartconnect
+//Activer wifi invité 		&config={"guest_enabled":true}&netif=smartconnect
+//Désactiver wifi invité 	&config={"guest_enabled":false}&netif=smartconnect
+
+
 		//json of SYNO.Core.System.Utilization (cpu, mem, network etc)
 		$RequeteaEnvoyer=$server.'/webapi/'.$path_core.$parametresAPI.'&version='.$vCore.'&_sid='.$sid.$parameters;
 		//echo "<br>".$RequeteaEnvoyer;
-		//log::add('synologyapi', 'debug', 'A envoyer :'.$RequeteaEnvoyer);
+		log::add('synologyapi', 'debug', 'A envoyer :'.$RequeteaEnvoyer);
 
 		//$begin_time = array_sum(explode(' ', microtime()));
 		$json_Data = file_get_contents($RequeteaEnvoyer, false, stream_context_create($arrContextOptions));

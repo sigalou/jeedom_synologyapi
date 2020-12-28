@@ -132,6 +132,7 @@ $hauteuriFrame="80%";
 			<select id="Methode" class="form-control input-sm expressionAttr" style="width: 300px">
 				<option value="get" selected>Get</option>
 				<option value="query" >Query</option>
+				<option value="set" >Set</option>
 				<option value="info" >Info</option>
 
 			</select>

@@ -46,6 +46,8 @@ function getURI(){
 
   
 		$obj_Data=synologyapi::recupereDonneesJson ($sid, $API, $parametresAPI, $parameters, $idsynology);
+		log::add('synologyapi', 'debug', 'résultat: '.json_encode($obj_Data));		
+		
 		$inforetour=traiteDonneesJson ($API, $obj_Data, $idsynology, $parametresAPI);
 
 ?>
