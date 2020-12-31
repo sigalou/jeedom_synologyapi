@@ -133,6 +133,7 @@ $hauteuriFrame="80%";
 				<option value="get" selected>Get</option>
 				<option value="query" >Query</option>
 				<option value="set" >Set</option>
+				<option value="check" >Check</option>
 				<option value="info" >Info</option>
 
 			</select>
