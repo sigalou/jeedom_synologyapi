@@ -6,7 +6,9 @@ if (!isConnect('admin')) {
   throw new Exception('{{401 - Accès non autorisé}}');
 }
 //include_file('desktop', 'bootstrap/css/bootstrap-theme', 'css');
-
+	$plugin = plugin::byId('synologyapi');
+	//sendVarToJS('eqType', $plugin->getId());
+	$eqLogics = eqLogic::byType($plugin->getId());
 
 //$API="SYNO.Core.System.Utilization";
 //$method="get";
@@ -45,10 +47,10 @@ function getURI(){
 //echo "<br>parameters : ".$parameters; 
 
  
-	$obj_Data=synologyapi::recupereDonneesJson ($sid, $API, $parametresAPI, $parameters, $idsynology);
+	$obj_Data=synologyapi::recupereDonneesJson ($sid, $parametresAPI, $parameters, $idsynology);
 	log::add('synologyapi', 'debug', 'résultat: '.json_encode($obj_Data));		
 
-	$inforetour=traiteDonneesJson ($API, $obj_Data, $idsynology, $parametresAPI, $method);
+	$inforetour=traiteDonneesJson ($API, $obj_Data, $idsynology, $parametresAPI, $method, $eqLogics);
 
 ?>
 <script>
@@ -98,7 +100,7 @@ function actionCaseCocher(laCase, API) {
 };</script>
 <?php
 
-function traiteDonneesJson ($API,$obj_coreData,$idsynology, $parametresAPI, $method)
+function traiteDonneesJson ($API,$obj_coreData,$idsynology, $parametresAPI, $method, $eqLogics)
 {
 
 //On va tester si l'API a renvoyé une erreur (xx enregistrements) ou si ça a fonctionné
@@ -115,8 +117,8 @@ function traiteDonneesJson ($API,$obj_coreData,$idsynology, $parametresAPI, $met
 			$autresParametres=str_replace("?v=d&plugin=synologyapi&modal=testAPI", "", str_replace("&idsynology=1&","",str_replace("&idsynology=2&","",str_replace("&idsynology=3&","",str_replace("SYNO.", "", $parametresAPI)))));
 			//echo "<br>autresParametres : ".$autresParametres; 
 
-			echo "Requête envoyée et executée avec succès !<br>";
-			echo "Résultat : <b>".json_encode($obj_coreData)."</b><br>";
+			echo "<br><font color=#8fc935>Requête envoyée et executée avec succès !<br>";
+			echo "Résultat : <b>".json_encode($obj_coreData)."</b></font>";
 			
 			echo '<form action="index.php?v=d&plugin=synologyapi&modal=testAPISaveCmd" method="post">';
 				/*
@@ -138,14 +140,44 @@ function traiteDonneesJson ($API,$obj_coreData,$idsynology, $parametresAPI, $met
 //			echo '<input id="nomCmd" name="nomCmd" value="">';
 			echo '<input id="parametresAPI" type="hidden" name="parametresAPI" value="'.str_replace("v=d&plugin=synologyapi&modal=testAPI&", "", $parametresAPI).'">'; 
 
-			echo '<br><br>
+			echo '
 				<div class="card">
 				<div class="card-header" style="background-color:#979797">
-				<table border=2 width=100%>
+				<table border=0 width=100%>
 				<tr><td colspan=2><h5 class="card-title"><B>Nouvelle commande avec l\'api '.str_replace("SYNO.", "", $API).'</B></h5></td></tr>
-				<tr><td>Titre de la nouvelle commande : </td><td><input id="nouvelleCmd" size=80% name="nouvelleCmd" value="'.str_replace("SYNO.", "", $API).'"></td></tr>
-				<tr><td>Requete de la nouvelle commande : </td><td><input id="request" size=90% name="request" value="'.$autresParametres.'"></td></tr>
-				<tr><td>Ajouter la nouvelle commande au groupe : </td><td><input id="nouveauGroupe" size=90% name="nouveauGroupe" value="Mes commandes"></td></tr>
+				<tr><td>Titre de la nouvelle commande (à personnaliser) : </td><td><input  id="nouvelleCmd" size=80% name="nouvelleCmd" value="'.str_replace("SYNO.", "", $API).'"></td></tr>
+				<tr><td>Requête de la nouvelle commande : </td><td><input id="request" size=90% name="request" readonly value="'.$autresParametres.'"></td></tr>
+				<tr><td colspan=2><hr></td></tr>
+				<tr><td>Ajouter la nouvelle commande au groupe : </td><td>';
+				//trouver la liste des groupes de cmd
+?>
+<script>
+function formupdate() {
+    var selectedPackage = document.getElementById("id_group").value;
+    if ( selectedPackage == '' ) {
+        document.getElementById('nouveauGroupe').style.display = "block";
+    } else {
+        document.getElementById('nouveauGroupe').style.display = "none";
+	}
+}
+</script>
+
+								<select style="width:400px;" id="id_group" name="id_group" onchange="formupdate();" class="eqLogicAttr form-control" data-l1key="object_id">
+									<option selected value="">{{Créer un nouveau groupe de commandes}}</option>
+									<?php
+										foreach ($eqLogics as $eqLogic) {
+											if (($eqLogic->getConfiguration('devicetype') == $idsynology) && ($eqLogic->getConfiguration('type') == "cmd")) {
+											echo '<option value="' . $eqLogic->getId() . '">' . $eqLogic->getName() .'</option>';
+											}
+										}
+										?>
+								</select>
+				<div id="nouveauGroupe" style="display:block;"><input id="nouveauGroupe" style="width:400px;" name="nouveauGroupe" placeholder="{{Nom du nouveau groupe}}"></div>
+<?php
+				
+			//	<input id="nouveauGroupe" size=90% name="nouveauGroupe" value="Mes commandes">';
+				
+			echo '	</td></tr>
 				<tr><td></td><td><input type="submit" style="background-color:#67b367;width: 200;border: 0px;padding: 12px 12px;color:#efefef"  value="Ajouter cette commande"></td></TR>
 				</table>
 				</div>
