@@ -7,6 +7,24 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
+ 
+ 
+ supprimer la récompense :
+config_group_id=3&ultra_rewards=%5B%5D&api=SYNO.SafeAccess.AccessControl.ConfigGroup.Reward.Ultra&method=set&version=1
+
+Tout mettre en pause :
+config_group_id=3&pause=true&api=SYNO.SafeAccess.AccessControl.ConfigGroup&method=set&version=1
+config_group_id=3&pause=true
+
+Reprendre :
+config_group_id=3&pause=false&api=SYNO.SafeAccess.AccessControl.ConfigGroup&method=set&version=1
+config_group_id=3&pause=true
+ 
+ 
+ 
+ 
+ 
+ 
  * Jeedom is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the

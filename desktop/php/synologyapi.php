@@ -218,7 +218,7 @@
 			<div role="tabpanel" class="tab-pane" id="commandtab">
 				<br>
 				<!--<a class="btn btn-success btn-sm cmdAction pull-right" data-action="add" style="margin-top:5px;"><i class="fa fa-plus-circle"></i> {{Commandes}}</a><br/><br/>-->
-				<table class="table-condensed" border=0 width=100%><tr><th style="width: 510px;">{{  Nom}}</th><th>{{  Paramètres de la commande à envoyer}}</th><th class="text-center" style="width:440px;">Options</th></tr></table>
+				<table class="table-condensed" border=0 width=100%><tr><th style="width: 530px;">{{  Nom}}</th><th style="width: 400px;">{{  Paramètres de la commande à envoyer}}</th><th class="text-center" style="width:290px;">Options</th></tr></table>
 				<table id="table_cmd" class="table-condensed ui-sortable table_controles" border=0 width=100%>
 					<tbody></tbody>
 				</table>

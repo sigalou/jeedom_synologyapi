@@ -241,6 +241,7 @@ function addCmdToTable(_cmd) {
 	
 	//console.log("coucou");
 	//console.dir(_cmd);
+	// 400 (name) + 130 (info) + 400 (requete) + 200 + 90
 	
 	    DefinitionDivPourCommandesPredefinies = 'style="display: none;"';
 	
