@@ -131,6 +131,7 @@ $hauteuriFrame="80%";
 			<span class="input-group-addon success" style="width: 140px">Méthode à utiliser</span>
 			<select id="Methode" class="form-control input-sm expressionAttr" style="width: 300px">
 				<option value="get" selected>Get</option>
+				<option value="get-remote" selected>Get-remote</option>
 				<option value="query" >Query</option>
 				<option value="set" >Set</option>
 				<option value="check" >Check</option>
