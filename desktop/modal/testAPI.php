@@ -250,6 +250,7 @@ function formupdate() {
 											$nom_Valeur3=$API."-".$key."|".$key2."|".$key3;
 											$nom_Valeur3_courte=$key2."|".$key3;
 											if (is_array($value3)) {
+												echo "<hr>";
 												//echo "<br>c'est un array3";
 												if (empty($value3)) {
 													//echo "vide";
@@ -264,7 +265,7 @@ function formupdate() {
 																foreach ($value4 as $key5 => $value5) {
 																	$nom_Valeur5=$API."-".$key."|".$key2."|".$key3."|".$key4."|".$key5;
 																	if (is_array($value5)) {
-																		//echo "<br>c'est un array";
+																		//echo "<br>c'est un array5";
 																		if (empty($value5)) {
 																			//echo "vide";
 																		} else {
@@ -316,8 +317,9 @@ function formupdate() {
 	// On a une erreur
 			$CodeError=$obj_coreData['error']['code']; //{"error":{"code":119},"success":false}
 	//echo '<form action="index.php?v=d&plugin=synologyapi&modal=testAPISaveRequete" method="post">';
-	echo "<table border=0 width=100%><tr><td width=50%>Oups ! Echec !<br>Debug :<b>";
-	echo json_encode($obj_coreData)."</b> ".date("Y-m-d H:i:s");
+	echo "<table border=0 width=100%><tr><td width=50%><b>Oups ! Echec !</b><br><br>Debug :<b><br><ul>";
+	echo "<li>". str_replace("v=d&plugin=synologyapi&modal=testAPI&", "", $parametresAPI)."</li><li>";
+	echo json_encode($obj_coreData)."</b></li><li>".date("Y-m-d H:i:s")."</li></ul>";
 	echo "</td><td width=50%><br> <button style='background-color:#ffa638;font-size:120%;width: 400;border: 0px;padding: 12px 12px;color:#ffffff;' onclick='window.parent.lanceAPIdepuisIFrame(\"".$parametresAPI."\")'>Relancer la requête</button> ";
 	echo "</td></tr></table></form>";
 	

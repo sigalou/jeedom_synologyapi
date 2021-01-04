@@ -321,6 +321,7 @@ $arrContextOptions=array(
 	{
 		parse_str(str_replace("?", "", $parametresAPI), $outputArray);
 		$API=$outputArray['api'];
+		$versionSiPresente=$outputArray['version'];
  /*
 	log::add('synologyapi', 'debug', '[parametresAPI] '.$parametresAPI);
 	log::add('synologyapi', 'debug', 'lancement  recupereDonneesJson '.$API);
@@ -374,9 +375,11 @@ $arrContextOptions=array(
 		$obj_core = json_decode($json_core);
 		$path_core = $obj_core->data->{$API}->path;	
 		$vCore = $obj_core->data->{$API}->maxVersion;	
+		//$vCore = "1";
+		if ($versionSiPresente>0) $vCore=$versionSiPresente; // affecte la version si elle est précisée dans les paramètres
+	//log::add('synologyapi', 'debug', '[versionSiPresente] '.$versionSiPresente);
 		
 		/*
-		$vCore = "1";
 		$path_core = "entry.cgi";	
 		log::add('synologyapi', 'debug', 'path : '.$path_core);
 		log::add('synologyapi', 'debug', 'version : '.$vCore);
