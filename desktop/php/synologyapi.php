@@ -47,6 +47,7 @@
 						echo '<span class="name" >'. $eqLogic->getHumanName(true, true) .'</span>';
 						echo '</div>';
 						}	else {			
+						$compteur--; //pour eviter de compter Refresh
 						$opacity = ($eqLogic->getIsEnable()) ? '' : 'disableCard';
 						echo '<div class="eqLogicDisplayCard cursor '.$opacity.'" data-eqLogic_id="' . $eqLogic->getId() . '">';
 						echo '<img src="' . $plugin->getPathImgIcon() . '"/>';
@@ -110,9 +111,9 @@
 		</div>
 		<ul class="nav nav-tabs" role="tablist">
 			<li role="presentation"><a href="#" class="eqLogicAction" aria-controls="home" role="tab" data-toggle="tab" data-action="returnToThumbnailDisplay"><i class="fa fa-arrow-circle-left"></i></a></li>
-			<li id="OngletEquipement" role="presentation" class="active"><a href="#eqlogictab" aria-controls="home" role="tab" data-toggle="tab"><i class="fas fa-tachometer-alt"></i> {{Equipement}}</a></li>
-			<li id="OngletGroupeCmd" role="presentation" class="active"><a href="#eqlogictab2" aria-controls="home2" role="tab" data-toggle="tab"><i class="fas fa-tachometer-alt"></i> {{Groupe de commandes}}</a></li>
-			<li id="OngletCommandes" role="presentation"><a href="#commandtab" aria-controls="profile" role="tab" data-toggle="tab"><i class="fa fa-list-alt"></i> {{Informations}}</a></li>
+			<li id="OngletEquipement" role="presentation" class="active"><a href="#eqlogictab" aria-controls="home" role="tab" data-toggle="tab"><i class="fas fa-exchange-alt"></i> {{API}}</a></li>
+			<li id="OngletGroupeCmd" role="presentation" class="active"><a href="#eqlogictab2" aria-controls="home2" role="tab" data-toggle="tab"><i class="fas fa-tachometer-alt"></i> {{Commandes}}</a></li>
+			<li id="OngletCommandes" role="presentation"><a href="#commandtab" aria-controls="profile" role="tab" data-toggle="tab"><i class="fa fa-list-alt"></i> {{Informations Récupérées}}</a></li>
 			<li id="OngletListeAPI" role="presentation"><a href="#eqlogictab" class="active" aria-controls="profile" role="tab" data-toggle="tab"><i class="fa fa-list-alt"></i> {{Liste des API}}</a></li>
 		</ul>
 		<!---------------- Onglet ListeAPI --------------  
@@ -139,9 +140,9 @@
 				<form class="form-horizontal">
 					<fieldset>
 						<br>
-						<legend><i class="fas fa-cogs" style="font-size : 2em;"></i> <span >{{Identification de l'API à utiliser}}</span></legend>
+						<legend><i class="fas fa-exchange-alt" style="font-size : 2em;"></i> <span >{{Identification de l'API à utiliser}}</span></legend>
 						<div class="form-group">
-							<label class="col-sm-3 control-label">{{Nom de l'API personnalisé}}</label>
+							<label class="col-sm-3 control-label">{{Nom de l'équipement Jeedom}}</label>
 							<div class="col-sm-3">
 								<input type="text" class="eqLogicAttr form-control" data-l1key="id" style="display : none;" />
 								<input type="text" class="eqLogicAttr form-control" data-l1key="name" placeholder="{{Nom de l'équipement synologyapi}}"/>
@@ -193,7 +194,7 @@
 							</div>
 						</div>
 						<br>
-						<legend><i class="far fa-clock" style="font-size : 2em;"></i> <span >{{Actualisation périodique des données}}</span></legend>
+						<legend><i class="far fa-clock" style="font-size : 2em;"></i> <span >{{Interrogation périodique de l'API}}</span></legend>
 						<br><br>
 						<div class="form-group">
 							<label class="col-xs-3 control-label">{{Auto-actualisation (cron)}}</label>
@@ -259,7 +260,7 @@
 								<label class="checkbox-inline"><input type="checkbox" class="eqLogicAttr" data-l1key="configuration" data-l2key="isVisibleGroup" checked/>{{Visible}}</label>
 							</div>
 						</div>
-						<legend><i class="fa fa-list-alt" style="font-size : 2em;"></i> <span >{{Liste des commandes du groupe}}</span></legend>
+						<legend><i class="fa fa-list-alt" style="font-size : 2em;"></i> <span >{{Liste des commandes}}</span></legend><br>
 				<table id="table_cmdTitre2" class="table-condensed" border=0 width=100%></table>
 				<table id="table_cmd2" class="table-condensed ui-sortable table_controles" border=0 width=100%>
 					<tbody></tbody>

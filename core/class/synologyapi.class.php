@@ -133,37 +133,7 @@ public static function update() {
 					try {
 						$c = new Cron\CronExpression($autorefresh, new Cron\FieldFactory);
 						if ($c->isDue()) {
-							try {
-								if 		($synologyapi->getConfiguration('devicetype') == "2") $nomSynology = config::byKey('Syno2_name','synologyapi');
-								elseif	($synologyapi->getConfiguration('devicetype') == "3") $nomSynology = config::byKey('Syno3_name','synologyapi');
-								else 														  $nomSynology = config::byKey('Syno1_name','synologyapi');
-								//$synologyapi->setConfiguration('boucleEnCours', "CRON");
-								//$_boucleEnCours="CRON";
-								//log::add('synologyapi','debug','-----------------------------------------------------------------');
-								//log::add('synologyapi','debug',"Actualisation des données de l'API ".$synologyapi->getName().' ('.$synologyapi->getConfiguration('device').') sur '.$nomSynology);
-								log::add('synologyapi', 'info', " ║");
-								log::add('synologyapi', 'info', " ╠═ Actualisation des données de l'API ".$synologyapi->getName().' ('.$synologyapi->getConfiguration('device').') sur '.$nomSynology);
-
-								//log::add('synologyapi','debug','-----------------------------------------------------------------');
-								$nbmaxdetentative=3;//a voir si on le met en paramètre
-								$compteerreur=0;
-								$RequeteOK=false;
-
-								while (($compteerreur <= $nbmaxdetentative) && (!$RequeteOK)) {
-									$RequeteOK=$synologyapi->lancerControle($synologyapi, $ArraySID);
-									if ($RequeteOK) break; // pour ne pas executer la recherche de SID derrière
-									// on va rechercher SID pour faire un genre de pause
-									if (config::byKey('Syno1_name','synologyapi') !="" )	$ArraySID[1]=self::vaChercherSID("1");	else 	$ArraySID[1]="";
-									if (config::byKey('Syno2_name','synologyapi') !="" )	$ArraySID[2]=self::vaChercherSID("2");	else 	$ArraySID[2]="";
-									if (config::byKey('Syno3_name','synologyapi') !="" )	$ArraySID[3]=self::vaChercherSID("3");	else 	$ArraySID[3]="";
-									$compteerreur++;
-								}
-
-								//log::add('synologyapi','debug','fin cron-----------------------------------------------------------------');
-							} catch (Exception $exc) {
-								log::add('synologyapi', 'error', __('Erreur pour ', __FILE__) . $synologyapi->getHumanName() . ' : ' . $exc->getMessage());
-							}
-							$synologyapi->save();
+						self::actualiseCmdInfo($synologyapi, $ArraySID);
 						}
 					} catch (Exception $exc) {
 						log::add('synologyapi', 'error', __('Expression cron non valide pour ', __FILE__) . $synologyapi->getHumanName() . ' : ' . $autorefresh);
@@ -175,6 +145,46 @@ public static function update() {
 	}
 }
 
+	public function actualiseCmdInfo($synologyapi, $ArraySID) {
+		try {
+			if 		($synologyapi->getConfiguration('devicetype') == "2") $nomSynology = config::byKey('Syno2_name','synologyapi');
+			elseif	($synologyapi->getConfiguration('devicetype') == "3") $nomSynology = config::byKey('Syno3_name','synologyapi');
+			else 														  $nomSynology = config::byKey('Syno1_name','synologyapi');
+			//$synologyapi->setConfiguration('boucleEnCours', "CRON");
+			//$_boucleEnCours="CRON";
+			//log::add('synologyapi','debug','-----------------------------------------------------------------');
+			//log::add('synologyapi','debug',"Actualisation des données de l'API ".$synologyapi->getName().' ('.$synologyapi->getConfiguration('device').') sur '.$nomSynology);
+			log::add('synologyapi', 'info', " ║");
+			log::add('synologyapi', 'info', " ╠═ Actualisation des données de l'API ".$synologyapi->getName().' ('.$synologyapi->getConfiguration('device').') sur '.$nomSynology);
+			//log::add('synologyapi','debug','-----------------------------------------------------------------');
+			$nbmaxdetentative=3;//a voir si on le met en paramètre
+			$compteerreur=0;
+			$RequeteOK=false;
+			while (($compteerreur <= $nbmaxdetentative) && (!$RequeteOK)) {
+				$RequeteOK=$synologyapi->lancerControle($synologyapi, $ArraySID);
+				if ($RequeteOK) break; // pour ne pas executer la recherche de SID derrière
+				// on va rechercher SID pour faire un genre de pause
+				if (config::byKey('Syno1_name','synologyapi') !="" )	$ArraySID[1]=self::vaChercherSID("1");	else 	$ArraySID[1]="";
+				if (config::byKey('Syno2_name','synologyapi') !="" )	$ArraySID[2]=self::vaChercherSID("2");	else 	$ArraySID[2]="";
+				if (config::byKey('Syno3_name','synologyapi') !="" )	$ArraySID[3]=self::vaChercherSID("3");	else 	$ArraySID[3]="";
+				$compteerreur++;
+			}
+			//log::add('synologyapi','debug','fin cron-----------------------------------------------------------------');
+		} catch (Exception $exc) {
+			log::add('synologyapi', 'error', __('Erreur pour ', __FILE__) . $synologyapi->getHumanName() . ' : ' . $exc->getMessage());
+		}
+		$synologyapi->save();
+	}
+	
+	public function refresh() {
+		
+	$idsynology=$this->getConfiguration('devicetype');
+	$sid=synologyapi::vaChercherSID($idsynology);
+	$ArraySID=array();
+	$ArraySID[$idsynology]=$sid;
+	self::actualiseCmdInfo($this, $ArraySID);
+	}
+	
 	public function lancerControle($synologyapi,$ArraySID) {
 		
 		//log::add('synologyapi', 'debug', "$ArraySID ".json_encode($ArraySID));
@@ -447,6 +457,26 @@ $arrContextOptions=array(
  // Fonction exécutée automatiquement après la sauvegarde (création ou mise à jour) de l'équipement 
     public function postSave() {
         
+				//log::add('synologyapi', 'debug', 'Post Save '.$this->getName());
+
+			if ($this->getConfiguration('type') != "cmd") {
+		        //Commande Refresh, ajoutée si n'existe pas
+                $createRefreshCmd = true;
+                $refresh = $this->getCmd(null, 'refresh');
+                if (!is_object($refresh)) {
+					//log::add('synologyapi', 'debug', 'Post Save- ajoute');
+                        $refresh = new synologyapiCmd();
+                        $refresh->setLogicalId('refresh');
+                        $refresh->setIsVisible(1);
+                        $refresh->setDisplay('icon', '<i class="fas fa-sync"></i>');
+                        $refresh->setName(__('Refresh', __FILE__));
+						$refresh->setType('action');
+						$refresh->setSubType('other');
+	                    $refresh->setOrder('99');
+						$refresh->setEqLogic_id($this->getId());
+						$refresh->save();
+                }
+			}
     }
 
  // Fonction exécutée automatiquement avant la suppression de l'équipement 
@@ -502,7 +532,17 @@ class synologyapiCmd extends cmd {
 
   // Exécution d'une commande  
  public function execute($_options = array()) {
+	 
+	    if ($this->getLogicalId() == 'refresh') {
+		log::add('synologyapi', 'info', " ╔══════════════════════[Lancement Refresh de ".$this->getEqLogic()->getName()."]═════════════════════════════════════════════════════════");
+            $this->getEqLogic()->refresh();
+		log::add('synologyapi', 'info', ' ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════');
+            return;
+        }
+	 
     if ($this->getType() != 'action') return;
+	
+	
 		log::add('synologyapi', 'info', " ╔══════════════════════[Execution de la commande ".$this->getName()."]═════════════════════════════════════════════════════════");
 								//log::add('synologyapi', 'info', " ║");
 								//log::add('synologyapi', 'info', " ╠═ Actualisation des données de l'API ".$synologyapi->getName().' ('.$synologyapi->getConfiguration('device').') sur '.$nomSynology);

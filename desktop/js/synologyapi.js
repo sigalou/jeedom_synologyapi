@@ -251,7 +251,51 @@ function addCmdToTable(_cmd) {
   if (!isset(_cmd.configuration)) {
     _cmd.configuration = {};
   }
+  
+  
   if (init(_cmd.logicalId) == 'refresh') {
+    var tr = '<tr class="cmd" data-cmd_id="' + init(_cmd.id) + '" virtualAction="' + init(_cmd.configuration.virtualAction) + '">';
+		
+		tr += '<td width=400px>';
+ tr += '<span class="cmdAttr" data-l1key="id" style="display:none;"></span>';
+		tr += '<input class="cmdAttr form-control input-sm" data-l1key="name" style="margin-bottom : 30px;width : 100%;" placeholder="{{Nom}}">';
+
+    tr += '</td>';
+
+
+    tr += '<td>';
+    tr += '<input style="margin-bottom : 30px;" class="cmdAttr form-control type input-sm" data-l1key="type" value="action" disabled />';
+    tr += '<div ' + DefinitionDivPourCommandesPredefinies + '>';
+    tr += '<span class="subType" subType="' + init(_cmd.subType) + '"></span>';
+    tr += '</div>';
+
+
+
+
+
+    tr += '</td><td></td>' +
+      '<td>' +
+      '<span><label class="checkbox-inline"><input type="checkbox" class="cmdAttr checkbox-inline" data-l1key="isVisible" checked/>{{Afficher}}</label></span> ' +
+      '</td>' +
+      '<td>';
+
+    if (is_numeric(_cmd.id)) {
+      tr += '<a class="btn btn-default btn-xs cmdAction expertModeVisible" data-action="configure"><i class="fas fa-cogs"></i></a> ';
+      if (!((init(_cmd.name) == "Routine") || (init(_cmd.name) == "xxxxxxxx"))) //Masquer le bouton Tester
+        tr += '<a class="btn btn-default btn-xs cmdAction" data-action="test"><i class="fas fa-rss"></i> {{Tester}}</a>';
+    }
+    tr += '<i class="fas fa-minus-circle pull-right cmdAction cursor" data-action="remove"></i>' +
+      '  </td>' +
+      '</tr>';
+
+
+    $('#table_cmd tbody').append(tr);
+    $('#table_cmd tbody tr').last().setValues(_cmd, '.cmdAttr');
+    if (isset(_cmd.type)) {
+      $('#table_cmd tbody tr:last .cmdAttr[data-l1key=type]').value(init(_cmd.type));
+    }
+    jeedom.cmd.changeType($('#table_cmd tbody tr').last(), init(_cmd.subType));
+  
     return;
   }
   
@@ -283,7 +327,7 @@ function addCmdToTable(_cmd) {
     if (init(_cmd.logicalId) == "refresh")
       tr += ' style="display:none;" ';
     tr += ' data-l1key="configuration" data-l2key="requestAPI">';
-    tr += '<td width=200>';
+    tr += '<td width=190>';
     tr += '<input class="tooltips cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="minValue" placeholder="{{Min}}" title="{{Min}}" style="width:30%;display:inline-block;">';
     tr += '<input class="tooltips cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="maxValue" placeholder="{{Max}}" title="{{Max}}" style="width:30%;display:inline-block;">';
     tr += '<input class="cmdAttr form-control input-sm" data-l1key="unite" placeholder="Unité" title="{{Unité}}" style="width:50px;display:inline-block;margin-right:5px;">';
@@ -293,7 +337,7 @@ function addCmdToTable(_cmd) {
     tr += '<span><label class="checkbox-inline"><input type="checkbox" class="cmdAttr" data-l1key="display" data-l2key="invertBinary"/>{{Inverser}}</label></span> ';
     tr += '</td>';
     
-    tr += '<td width=90>';
+    tr += '<td width=100>';
     if (is_numeric(_cmd.id)) {
       tr += '<a class="btn btn-default btn-xs cmdAction" data-action="configure"><i class="fas fa-cogs"></i></a> ';
       tr += '<a class="btn btn-default btn-xs cmdAction" data-action="test"><i class="fas fa-rss"></i> {{Tester}}</a>';
