@@ -46,7 +46,7 @@ if (!isConnect()) {
 				<input class="configKey form-control" data-l1key="Syno1_login" placeholder="{{admin}}" />
 			</div>
 			<div class="col-lg-4">
-				<input class="configKey form-control" data-l1key="Syno1_password" placeholder="{{password}}" />
+				<input type="password" class="configKey form-control" data-l1key="Syno1_password" placeholder="{{password}}" />
 			</div>
 		</div>		
 		
@@ -71,7 +71,7 @@ if (!isConnect()) {
 				<input class="configKey form-control" data-l1key="Syno2_login" placeholder="{{admin}}" />
 			</div>
 			<div class="col-lg-4">
-				<input class="configKey form-control" data-l1key="Syno2_password" placeholder="{{password}}" />
+				<input type="password" class="configKey form-control" data-l1key="Syno2_password" placeholder="{{password}}" />
 			</div>
 		</div>		
 		
@@ -96,7 +96,7 @@ if (!isConnect()) {
 				<input class="configKey form-control" data-l1key="Syno3_login" placeholder="{{admin}}" />
 			</div>
 			<div class="col-lg-4">
-				<input class="configKey form-control" data-l1key="Syno3_password" placeholder="{{password}}" />
+				<input type="password" class="configKey form-control" data-l1key="Syno3_password" placeholder="{{password}}" />
 			</div>
 		</div>		
 		

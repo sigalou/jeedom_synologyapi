@@ -5,7 +5,7 @@
 if (!isConnect('admin')) {
   throw new Exception('{{401 - Accès non autorisé}}');
 }
-
+include_file('desktop', 'synologyapi', 'css', 'synologyapi'); 
 //$API="SYNO.Core.System.Utilization";
 //$method="get";
 // ********** LOGIN ************
@@ -27,14 +27,14 @@ unset($array[array_search($_POST['API'], $array)]); // on enlève API du tableau
 unset($array[array_search($_POST['md5'], $array)]); // on enlève md5 du tableau Array
 unset($array[array_search($_POST['parametresAPI'], $array)]); // on enlève parametresAPI du tableau Array
 
-echo "<BR>Sélection du Synology N°".$idSyno." : <font color=#e0e2e2><B>";
+echo "<BR><br>► Sélection du Synology N°".$idSyno." : <font color=#e0e2e2><B>";
 if ($idSyno == "1") 
 	echo config::byKey('Syno1_name','synologyapi');
 if ($idSyno == "2") 
 	echo config::byKey('Syno2_name','synologyapi');
 if ($idSyno == "3") 
 	echo config::byKey('Syno3_name','synologyapi');
-echo "</B></font> --- <font color=#8fc935><b>OK</b></font><BR>"; 
+echo "</B></font>  <span class='badgenonvolant badge-success'>OK</span><BR>"; 
 
 
 //." --- <font color=green><b>OK</b></font><BR>"; 
@@ -48,9 +48,9 @@ $eqLogics = synologyapi::byType('synologyapi');
 						
 						if (!is_object($device)) {
 							$device = createNewDevice($API, $md5);
-							echo "Création de l'API <font color=#e0e2e2><B>".$API."</B></font> --- <font color=#8fc935><b>OK</b></font><BR>"; 
+							echo "<br>► Création de l'API <font color=#e0e2e2><B>".$API."</B></font>  <span class='badgenonvolant badge-success'>OK</span><BR>"; 
 						} else {
-						echo "Modification de l'API <font color=#e0e2e2><B>".$API."</B></font> --- <font color=#8fc935><b>OK</b></font><BR>"; 
+						echo "<br>► Modification de l'API <font color=#e0e2e2><B>".$API."</B></font>  <span class='badgenonvolant badge-success'>OK</span><BR>"; 
 						}
 							//else echo "<br>Existe"; 
 						//log::add('alexaapi_scan', 'debug', '*** [Plugin ' . $pluginAlexaUnparUn . '] ->> détection1 de ' . $device->getName());
@@ -106,7 +106,7 @@ $name=str_replace("data|", "", $CMDaCreerouModifierCorrigee); //On supprimer dat
 $name=str_replace("|", ":", $name); //On remplace | par : pour le nom de la commande soit plus sympa
 				$cmd = $device->getCmd(null, $LogicalId);
 				if ((!is_object($cmd))) {
-					if (!is_object($cmd)) $cmd = new alexaapiCmd();
+					if (!is_object($cmd)) $cmd = new synologyapiCmd();
 					$cmd->setType('info');
 					$cmd->setLogicalId($LogicalId);
 					$cmd->setSubType('string');
@@ -121,10 +121,10 @@ $name=str_replace("|", ":", $name); //On remplace | par : pour le nom de la comm
 					//$cmd->setConfiguration('RunWhenRefresh', $RunWhenRefresh);
 					//$cmd->setDisplay('title_disable', $title_disable);
 				//	$cmd->setOrder($Order);
-				echo "<font color=#e0e2e2><B>".$name."</B></font> (".$LogicalId.")  --- <font color=#8fc935><b>Ajoutée</b></font><BR>"; 
+				echo "<br>► <font color=#e0e2e2><B>".$name."</B></font> (".$LogicalId.")   <span class='badgenonvolant badge-success'>Ajoutée</span><BR>"; 
 
 				} else {
-				echo "<font color=#e0e2e2><B>".$name."</B></font> (".$LogicalId.")  --- <font color=#c0c0c0><b>Pas d'action</b></font> (existe déja)<BR>"; 
+				echo "<br>► <font color=#e0e2e2><B>".$name."</B></font> (".$LogicalId.")  <span class='badgenonvolant badge-warning'>Pas d'action</span> (existe déja)<BR>"; 
 				}
 				$cmd->save();
 
@@ -151,7 +151,7 @@ $name=str_replace("|", ":", $name); //On remplace | par : pour le nom de la comm
 						
 		//	echo parent.document.getElementById(window.name);			
 ?><br>
-<input type='submit' onClick="window.parent.closeModal()" style='background-color:#539f53;font-size:120%;width: 400;border: 0px;padding: 12px 12px;color:#ffaf47;' value='Terminer'>
+<input type='submit' onClick="window.parent.closeModal()" style='background-color:#539f53;font-size:120%;width: 400;border: 0px;padding: 12px 12px;color:#ffffff;' value='Terminer'>
 
 
 

@@ -8,7 +8,7 @@ echo "<br>Masque échecs : ".$_GET['cache_errors'];
 $server = 'https://192.168.0.4:1975'; //your synology nas ip and port
 $server = 'https://192.168.0.1:1976'; //your synology nas ip and port
 $login = 'admin'; // your created api user
-$pass = 'christel'; //your password here in url encode
+$pass = ''; //your password here in url encode
 
 //Define ssl arguments
 $arrContextOptions=array(

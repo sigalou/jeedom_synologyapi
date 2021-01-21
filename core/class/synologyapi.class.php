@@ -102,7 +102,9 @@ public static function update() {
 	$onaunCronsurSyno3=false;
 	foreach (self::byType('synologyapi') as $synologyapi) { //on teste tous les devices
 		if ($synologyapi->getConfiguration('type') != "cmd") {
-			$autorefresh = $synologyapi->getConfiguration('autorefresh');
+			$autorefresh = checkAndFixCron($synologyapi->getConfiguration('autorefresh'));
+//		log::add('synologyapi', 'info', " autorefresh1: ".$autorefresh);
+//		log::add('synologyapi', 'info', " autorefresh2: ".checkAndFixCron($autorefresh));
 			if ($synologyapi->getIsEnable() == 1 && $autorefresh != '') {
 				$cron = new Cron\CronExpression($autorefresh, new Cron\FieldFactory);
 				if ($cron->isDue()) {
@@ -113,6 +115,7 @@ public static function update() {
 			}
 		}
 	}
+	
 	if ($onaunCronsurSyno1 || $onaunCronsurSyno2 || $onaunCronsurSyno3) {
 		//log::add('synologyapi','debug',"Lancement de l'actualisation automatique des données");
 		log::add('synologyapi', 'info', " ╔══════════════════════[Lancement de l'actualisation automatique des données]═════════════════════════════════════════════════════════");
@@ -127,7 +130,7 @@ public static function update() {
 		foreach (self::byType('synologyapi') as $synologyapi) {
 			if ($synologyapi->getConfiguration('type') != "cmd") { // on ne lance que si ce n'est pas une commande action
 				//log::add('synologyapi','debug','Lancement update de '.$synologyapi->getName().' ('.$synologyapi->getConfiguration('device').')');
-				$autorefresh = $synologyapi->getConfiguration('autorefresh');
+				$autorefresh = checkAndFixCron($synologyapi->getConfiguration('autorefresh'));
 				$synologyapi->setConfiguration('dernierLancement',date("d.m.Y")." ".date("H:i:s")); // PRECON c'est pour signaler que le CRON va etre sauvegarder
 				if ($synologyapi->getIsEnable() == 1 && $autorefresh != '') {
 					try {
@@ -436,29 +439,62 @@ $arrContextOptions=array(
 
  // Fonction exécutée automatiquement après la création de l'équipement 
     public function postInsert() {
-        
+         
     }
 
  // Fonction exécutée automatiquement avant la mise à jour de l'équipement 
     public function preUpdate() {
         
-    }
+		//	log::add('synologyapi', 'debug', 'preUpdate '.$this->getName().$this->getConfiguration('compteurinfo'));
+
+					}
 
  // Fonction exécutée automatiquement après la mise à jour de l'équipement 
     public function postUpdate() {
-        
+ 				//log::add('synologyapi', 'debug', 'postUpdate '.$this->getName().$this->getConfiguration('compteurinfo'));
+
     }
 
  // Fonction exécutée automatiquement avant la sauvegarde (création ou mise à jour) de l'équipement 
     public function preSave() {
-        
-    }
+     
+			/*log::add('synologyapi', 'debug', 'preSave '.$this->getName().$this->getConfiguration('compteurinfo'));
+
+				$compteurinfo=count($this->getCmd('info'));
+				$this->setConfiguration('compteurinfo', $compteurinfo);
+				$compteurcmd=0;
+				foreach ($this->getCmd('action') as $cmd) {
+					if ($cmd->getLogicalId() != "refresh") $compteurcmd++;
+				}
+				$this->setConfiguration('compteurcmd', $compteurcmd);					
+*/
+	}
 
  // Fonction exécutée automatiquement après la sauvegarde (création ou mise à jour) de l'équipement 
     public function postSave() {
         
-				//log::add('synologyapi', 'debug', 'Post Save '.$this->getName());
+		//	log::add('synologyapi', 'debug', 'PostSave '.$this->getName().$this->getConfiguration('compteurinfo'));
 
+
+				/*$compteurinfo=count($this->getCmd('info'));
+				$compteurcmd=0;
+				foreach ($this->getCmd('action') as $cmd) {
+					if ($cmd->getLogicalId() != "refresh") $compteurcmd++;
+				}
+						//log::add('synologyapi', 'debug', '******************                compteurinfo: '.$compteurinfo);
+						//log::add('synologyapi', 'debug', '******************getConfigurationcompteurinfo: '.$this->getConfiguration('compteurinfo'));
+						//log::add('synologyapi', 'debug', '******************                compteurcmd: '.$compteurcmd);
+						//log::add('synologyapi', 'debug', '******************getConfigurationcompteurcmd: '.$this->getConfiguration('compteurcmd'));
+				if (($compteurinfo != $this->getConfiguration('compteurinfo')) || ($compteurcmd != $this->getConfiguration('compteurcmd'))) {
+						//log::add('synologyapi', 'debug', '******************Différent ');
+				$this->setConfiguration('compteurinfo', $compteurinfo);
+				$this->setConfiguration('compteurcmd', $compteurcmd);
+				$this->save();
+				}	
+				*/
+
+
+					
 			if ($this->getConfiguration('type') != "cmd") {
 		        //Commande Refresh, ajoutée si n'existe pas
                 $createRefreshCmd = true;

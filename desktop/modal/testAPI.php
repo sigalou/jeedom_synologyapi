@@ -31,6 +31,9 @@ function getURI(){
     }
     return $adresse;
 }
+
+
+
 		$parametresAPI=getURI();
 		$sid=synologyapi::vaChercherSID($idsynology);
 
@@ -49,12 +52,10 @@ function getURI(){
  
 	$obj_Data=synologyapi::recupereDonneesJson ($sid, $parametresAPI, $parameters, $idsynology);
 	log::add('synologyapi', 'debug', 'résultat: '.json_encode($obj_Data));		
-
 	$inforetour=traiteDonneesJson ($API, $obj_Data, $idsynology, $parametresAPI, $method, $eqLogics);
 
 ?>
 <script>
-
 function actionCaseCocherTOUT(laCase) {
 	var cases = document.getElementsByTagName('input'); // toutes les cases
 	console.log(cases);
@@ -110,7 +111,7 @@ function traiteDonneesJson ($API,$obj_coreData,$idsynology, $parametresAPI, $met
 	// Le codage MD5 permet d'enregistré l'empreinte de cette requete, cela est nécessaire car certains API ont des paramètres particuliers, nota : le N° du syno est intégré
 	$md5=md5(str_replace("?v=d&plugin=synologyapi&modal=testAPI&api=", "", str_replace("SYNO.", "", $parametresAPI)));
 	
-
+	$nomBoutonVert="Sauvegarder";
 	if ($obj_coreData['success']== true) {
 		if ($method =="set") {
 			//log::add('synologyapi', 'debug', 'method!!!!!!!!!**!!!: '.$method);	
@@ -147,8 +148,8 @@ function traiteDonneesJson ($API,$obj_coreData,$idsynology, $parametresAPI, $met
 				<tr><td colspan=2><h5 class="card-title"><B>Nouvelle commande avec l\'api '.str_replace("SYNO.", "", $API).'</B></h5></td></tr>
 				<tr><td>Titre de la nouvelle commande (à personnaliser) : </td><td><input  id="nouvelleCmd" size=80% name="nouvelleCmd" value="'.str_replace("SYNO.", "", $API).'"></td></tr>
 				<tr><td>Requête de la nouvelle commande : </td><td><input id="request" size=90% name="request" readonly value="'.$autresParametres.'"></td></tr>
-				<tr><td colspan=2><hr></td></tr>
-				<tr><td>Ajouter la nouvelle commande au groupe : </td><td>';
+				<tr><td colspan=2><hr></td></tr>';
+			echo "				<tr><td>Ajouter la nouvelle commande à l'équipement : </td><td>";
 				//trouver la liste des groupes de cmd
 ?>
 <script>
@@ -163,16 +164,17 @@ function formupdate() {
 </script>
 
 								<select style="width:400px;" id="id_group" name="id_group" onchange="formupdate();" class="eqLogicAttr form-control" data-l1key="object_id">
-									<option selected value="">{{Créer un nouveau groupe de commandes}}</option>
+									<option selected value="">{{Créer un nouvel équipement}}</option>
 									<?php
 										foreach ($eqLogics as $eqLogic) {
-											if (($eqLogic->getConfiguration('devicetype') == $idsynology) && ($eqLogic->getConfiguration('type') == "cmd")) {
+											//if (($eqLogic->getConfiguration('devicetype') == $idsynology) && ($eqLogic->getConfiguration('type') == "cmd")) {
+											if ($eqLogic->getConfiguration('devicetype') == $idsynology) {
 											echo '<option value="' . $eqLogic->getId() . '">' . $eqLogic->getName() .'</option>';
 											}
 										}
 										?>
 								</select>
-				<div id="nouveauGroupe" style="display:block;"><input id="nouveauGroupe" style="width:400px;" name="nouveauGroupe" placeholder="{{Nom du nouveau groupe}}"></div>
+				<div id="nouveauGroupe" style="display:block;"><input id="nouveauGroupe" style="width:400px;" name="nouveauGroupe" placeholder="{{Nom du nouvel équipement}}"></div>
 <?php
 				
 			//	<input id="nouveauGroupe" size=90% name="nouveauGroupe" value="Mes commandes">';
@@ -184,14 +186,7 @@ function formupdate() {
 				';
 
 			echo '</form>';			
-			
-			
-			
-			
-			
-			
-			
-			
+
 			
 		} else {
 		
@@ -201,6 +196,10 @@ function formupdate() {
 				$device = synologyapi::byLogicalId($md5, 'synologyapi');
 				$listeExistent=array();
 				if (is_object($device)) {
+					$nomBoutonVert="Modifier";
+					echo "<div class='alert-info bg-success'>Cette requète existe déja, l'équipement Jeedom correspondant est ";
+					echo '<a class="btn btn-default btn-sm roundedRight" href="' . $device->getLinkToConfiguration() . '"  target="_blank"><b><u>'.$device->getName().'</u></b></a></div>';
+
 					// Faut chercher les commandes déja créées
 					foreach ($device->getCmd('info') as $cmd) {
 							array_push($listeExistent, $cmd->getLogicalId());
@@ -218,7 +217,7 @@ function formupdate() {
 									<h5 class="card-title">
 									<input style="position: relative;left:150px;" type="checkbox" class="custom-control-input" id="tout" onchange="actionCaseCocherTOUT(this)" >
 									<label style="color:#ffffff;" class="custom-control-label" for="tout"><B>'.str_replace("SYNO.", "", $API).'</B></label></h5></td><td align=right>
-									<input type="submit" style="background-color:#67b367;width: 200;border: 0px;padding: 12px 12px;color:#efefef"  value="Sauvegarder"></td></TR></table>
+									<input type="submit" style="background-color:#67b367;width: 200;border: 0px;padding: 12px 12px;color:#efefef"  value="'.$nomBoutonVert.'"></td></TR></table>
 								</div>
 				  <div class="card-body"  style="background-color:#727272">				
 				';
@@ -322,8 +321,6 @@ function formupdate() {
 	echo json_encode($obj_coreData)."</b></li><li>".date("Y-m-d H:i:s")."</li></ul>";
 	echo "</td><td width=50%><br> <button style='background-color:#ffa638;font-size:120%;width: 400;border: 0px;padding: 12px 12px;color:#ffffff;' onclick='window.parent.lanceAPIdepuisIFrame(\"".$parametresAPI."\")'>Relancer la requête</button> ";
 	echo "</td></tr></table></form>";
-	
-
 
 	// Afficher les codes d'erreur :
 	if ($CodeError=="100") echo "<br>Le code Erreur <b>100</b> signifie : <b>Erreur inconnue</b>";

@@ -130,7 +130,7 @@ $eqLogics = synologyapi::byType('synologyapi');
 
 				$cmd = $group->getCmd(null, $LogicalId);
 				if (!is_object($cmd)) {
-					$cmd = new alexaapiCmd();
+					$cmd = new synologyapiCmd();
 					$cmd->setType('action');
 					$cmd->setSubType('other');
 					$cmd->setLogicalId($LogicalId);

@@ -24,6 +24,14 @@ $('#bt_req').off('click').on('click', function () {
   $('#md_modal').load('index.php?v=d&plugin=synologyapi&modal=req&idsynology=1&api=SYNO.Core.System.Utilization&method=get').dialog('open');
 });
 
+$('#gotofusionner').off('click').on('click', function () {
+  $('#md_modal').dialog({
+    title: "{{Fusionner Commandes et Infos}}"
+  });
+//  $('#md_modal').load('index.php?v=d&plugin=synologyapi&modal=req&&idsynology=1&iddevice=' + $('.eqLogicAttr[data-l1key=logicalId]').value()).dialog('open');
+  $('#md_modal').load('index.php?v=d&plugin=synologyapi&modal=fusionner&idsynology=1&api=SYNO.Core.System.Utilization&method=get').dialog('open');
+});
+
 // On passe d'un device All à un device Syno
 /*
 function typeChange(){
@@ -179,19 +187,67 @@ function saveEqLogic(_eqLogic) {
         _eqLogic.configuration = {};
     }
 	
-	// Enregistre le nom du groupe dans name (donc dans le cas d'un groupe de commandes), même chose pour autres commandes
-	if (_eqLogic.configuration.nomGroup != ""){	
-		_eqLogic.name=_eqLogic.configuration.nomGroup;
-		_eqLogic.isVisible=_eqLogic.configuration.isVisibleGroup;
-		_eqLogic.isEnable=_eqLogic.configuration.isEnableGroup;
-		_eqLogic.object_id=_eqLogic.configuration.object_idGroup;
-	}
+
 	return _eqLogic;
 
 }
 
 function printEqLogic(_eqLogic) {
 
+//console.log("ICI:"+$('#Onglet_eqlogictab2').style.display);
+//typefield vaut : syno ou cmd ou cmdinfo
+
+if ($('#typefield').value() == 'syno') {// ne plus toucher ok
+//	$('#Onglet_groupeCommandes').hide();
+   // $('#OngletInfo').show();
+  //  $('#OngletCmd').hide();
+	
+	document.getElementById("OngletInfo").className = "active";
+	document.getElementById("TabInfo").className = "tab-pane active";
+	
+	document.getElementById("OngletInfo2").className = "";
+	document.getElementById("TabInfo2").className = "tab-pane";
+	
+	document.getElementById("OngletCmd").className = "hidden";
+	document.getElementById("TabCmd").className = "hidden";
+	
+//	$('#groupeCommandes').hide();
+ //   $('#eqlogictab').show();
+   // $('#eqlogictab2').show();
+}
+if ($('#typefield').value() == 'cmd') { // ne plus toucher ok
+    //$('#OngletInfo').hide();
+	document.getElementById("OngletInfo").className = "active";
+	document.getElementById("TabInfo").className = "tab-pane active";
+	
+	document.getElementById("OngletInfo2").className = "hidden";
+	document.getElementById("TabInfo2").className = "hidden";
+	
+	document.getElementById("OngletCmd").className = "";
+	document.getElementById("TabCmd").className = "tab-pane";
+   // $('#Onglet_eqlogictab2').hide();
+//	$('#OngletCmd').show();
+  //  $('#eqlogictab').hide();
+    //$('#eqlogictab2').hide();
+	//$('#groupeCommandes').show();
+}
+if ($('#typefield').value() == 'cmdinfo') { // ne plus toucher ok
+ //   $('#OngletInfo').show();
+	document.getElementById("OngletInfo").className = "active";
+	document.getElementById("TabInfo").className = "tab-pane active";
+	
+	document.getElementById("OngletInfo2").className = "";
+	document.getElementById("TabInfo2").className = "tab-pane";
+	
+	document.getElementById("OngletCmd").className = "";
+	document.getElementById("TabCmd").className = "tab-pane";
+ //   $('#OngletCmd').show();
+//	$('#Onglet_groupeCommandes').show();
+  //  $('#eqlogictab').show();
+    //$('#eqlogictab2').hide();
+	//$('#groupeCommandes').show();
+}
+ /*
     $('#OngletCommandes').hide();
     $('#OngletGroupeCmd').hide();
     $('#EcranGroupeCmd').hide();
@@ -203,21 +259,24 @@ function printEqLogic(_eqLogic) {
 if ($('#typefield').value() == 'all') {
 	$('#EcranListeAPI').show();
 	$('#OngletListeAPI').show();
-	//console.log ("changement3");
+}
+else if ($('#typefield').value() == 'cmdinfo') {
+	$('#OngletGroupeCmd').show();
+	$('#EcranGroupeCmd').show();
+	$('#OngletCommandes').show();
+	$('#OngletEquipement').show();
+	$('#EcranEquipement').show();
 }
 else if ($('#typefield').value() == 'cmd') {
 	$('#OngletGroupeCmd').show();
 	$('#EcranGroupeCmd').show();
-	//console.log ("changement4");
-}
-else { //les requetes infos
+}else { //les requetes infos
 	$('#OngletCommandes').show();
 	$('#OngletEquipement').show();
 	$('#EcranEquipement').show();
-	//console.log ("changement4");
 }
   
- /* 
+ 
 titreCmd=' <tr><th style="width: 410px;">{{  Nom personnalisable}}</th><th style="width: 130px;">{{Type}}</th><th style="width: 400px;">{{Champs API}}</th><th style="width: 280px;">{{Options}}</th>';
 $essai="coiucou";
 
@@ -230,7 +289,7 @@ else
 	
 	$('#table_cmdTitre2').append(titreCmd);
 	$('#table_cmdTitre').append(titreRequete);*/
-titreCmd=' <tr><th style="width: 410px;">{{  Nom de la commande}}</th><th style="width: 400px;">{{Commentaire ou explication (factultatif)}}</th><th >{{Commande à envoyer}}</th><th style="width: 240px;">{{Options}}</th>';
+titreCmd=' <tr><th style="width: 410px;">{{  Nom de la commande}}</th><th style="width: 400px;">{{Commentaire ou explication (facultatif)}}</th><th >{{Commande à envoyer}}</th><th style="width: 240px;">{{Options}}</th>';
 	
 $('#table_cmdTitre2').empty();
 	$('#table_cmdTitre2').append(titreCmd);
@@ -335,7 +394,7 @@ function addCmdToTable(_cmd) {
     tr += '<span><label class="checkbox-inline"><input type="checkbox" class="cmdAttr checkbox-inline" data-l1key="isVisible" checked/>{{Afficher}}</label></span> ';
     tr += '<span><label class="checkbox-inline"><input type="checkbox" class="cmdAttr checkbox-inline" data-l1key="isHistorized" checked/>{{Historiser}}</label></span> ';
     tr += '<span><label class="checkbox-inline"><input type="checkbox" class="cmdAttr" data-l1key="display" data-l2key="invertBinary"/>{{Inverser}}</label></span> ';
-    tr += '</td>';
+  //  tr += '88<span class="cmdAttr"  data-l1key="configuration" data-l2key="value">99</td>';
     
     tr += '<td width=100>';
     if (is_numeric(_cmd.id)) {
