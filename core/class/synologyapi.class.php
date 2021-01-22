@@ -334,7 +334,8 @@ $arrContextOptions=array(
 	{
 		parse_str(str_replace("?", "", $parametresAPI), $outputArray);
 		$API=$outputArray['api'];
-		$versionSiPresente=$outputArray['version'];
+		if(array_key_exists('version', $outputArray)){$versionSiPresente=$outputArray['version'];}
+		else{$versionSiPresente=0;}
  /*
 	log::add('synologyapi', 'debug', '[parametresAPI] '.$parametresAPI);
 	log::add('synologyapi', 'debug', 'lancement  recupereDonneesJson '.$API);
