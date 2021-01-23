@@ -288,7 +288,10 @@ public static function update() {
 			$pass = config::byKey('Syno1_password','synologyapi');
 			$nomSynology = config::byKey('Syno1_name','synologyapi');
 			}
-
+//echo "<br>".$server;
+//echo "<br>".$login;
+//echo "<br>".$pass;
+//echo "<br>".$nomSynology;
 		//echo "<b>API demandée</b> : ".str_replace("SYNO.", "", $API)." <b>sur</b> ".$nomSynology; 
 		//echo "<br><b>Paramètres</b> : ".str_replace("v=d&plugin=synologyapi&modal=testAPI&", "", str_replace("SYNO.", "", $parametresAPI))."<hr>"; 
 
@@ -301,18 +304,34 @@ $arrContextOptions=array(
 			"http"=>array(
 					"timeout" => 50, //50s
 				)
+				,
+			"https"=>array(
+					"timeout" => 50, //50s
+				)
 		);
 
 		//Get SYNO.API.Auth Path (recommended by Synology for further update) and maxVersion
 		// https://192.168.1.1:1976/webapi/query.cgi?api=SYNO.API.Info&version=1&method=query&query=SYNO.API.Auth
 		$begin_time = array_sum(explode(' ', microtime()));
 		$json = file_get_contents($server.'/webapi/query.cgi?api=SYNO.API.Info&version=1&method=query&query=SYNO.API.Auth', false, stream_context_create($arrContextOptions));
+		//echo "<br>A envoyer pour le pré-LOGIN :".$server.'/webapi/query.cgi?api=SYNO.API.Info&version=1&method=query&query=SYNO.API.Auth';
+		// http://192.168.1.250:1975/webapi/query.cgi?api=SYNO.API.Info&version=1&method=query&query=SYNO.API.Auth
+		//   http://192.168.1.1:1976/webapi/query.cgi?api=SYNO.API.Info&version=1&method=query&query=SYNO.API.Auth OK {"data":{"SYNO.API.Auth":{"maxVersion":3,"minVersion":1,"path":"auth.cgi"}},"success":true}
 		$end_time = array_sum(explode(' ', microtime()));
 		//log::add('synologyapi', 'debug', 'Le temps d\'exécution est '.($end_time - $begin_time));
+		//echo "JSON pré-LOGIN :".$json;
+		if ($json=="")
+		{
+		echo "<br>► <span class='badge-warning'>Echec de lien avec l'adresse du Synology N° ".$idsynology." Vérifier ".$server."</span>      <span class='badgenonvolant badge-danger'>Echec</span><br>"; 
+		log::add('synologyapi', 'debug', "╠═ L'adresse du Synology N°".$idsynology." est FAUX. Vérifier : ".$server);		
+		return false;
+		}
+		
 		$obj = json_decode($json);
+	
+		
 		$path = $obj->data->{'SYNO.API.Auth'}->path;
 		$vAuth = $obj->data->{'SYNO.API.Auth'}->maxVersion;
-		//https://192.168.0.4:1975/webapi/auth.cgi?api=SYNO.API.Auth&method=Login&version=2&account=admin&passwd=christel
 		//$vAuth='2';
 		$requeteaEnvoyer=$server.'/webapi/'.$path.'?api=SYNO.API.Auth&version='.$vAuth.'&method=login&account='.$login.'&passwd='.$pass.'&format=sid';
 		//echo "<br>A envoyer pour le LOGIN :".$requeteaEnvoyer;
@@ -320,10 +339,19 @@ $arrContextOptions=array(
 		//log::add('synologyapi', 'debug', 'Identification A envoyer :'.$requeteaEnvoyer);		
 		$json_login = file_get_contents($requeteaEnvoyer, false, stream_context_create($arrContextOptions));
 		$obj_login = json_decode($json_login);
+		//log::add('synologyapi', 'debug', "resultat JSON :".json_encode($obj_login));
+		
+		
 		//echo $server.'/webapi/'.$path.'?api=SYNO.API.Auth&version='.$vAuth.'&method=login&account='.$login.'&passwd='.$pass.'&format=sid';
 
-		if($obj_login->success != "true"){	echo "Login FAILED core";return false;}
-			$sid = $obj_login->data->sid;
+		if($obj_login->success != "true"){	
+		log::add('synologyapi', 'debug', '╠═╦═ Login FAILED sur Synology N°'.$idsynology);		
+		log::add('synologyapi', 'debug', "║ ╚═ Message d'erreur :".$json_login);	
+		echo "<br>► <span class='badge-warning'> Erreur sur Synology N° ".$idsynology." </span>      <span class='badgenonvolant badge-danger'>Echec</span> Debut : ".$json_login; 
+		if ($obj_login->error->code=="407") 	echo "   <span class='badge-warning'> Code 407= Trop d'échecs, IP blacklistée (à corriger dans Sécurité/compte/liste des blocages)</span>"; 
+		return false;
+		}
+		$sid = $obj_login->data->sid;
 		//log::add('synologyapi', 'debug', "Login OK sur Synology N°".$idsynology." (".$sid.")");
 		log::add('synologyapi', 'debug', '╠═ Login OK sur Synology N°'.$idsynology." (".$sid.")");		
 

@@ -68,11 +68,11 @@ $eqLogicSauvegarde="";
 		$ancienNom=$eqLogicaModifier->getName();
 		$eqLogicaModifier->setConfiguration('type', 'cmdinfo');
 		echo "► Changement de type de : ".$ancienNom." <span class='badgenonvolant badge-success'>OK</span><br>" ;
+		echo '► Suppression de '.$eqLogicSauvegarde->getName()." <span class='badgenonvolant badge-success'>OK</span><br>" ;
+		$eqLogicSauvegarde->remove();						
 		$eqLogicaModifier->setName($_GET['titre']); 
 		echo "► ".$ancienNom.' a été renommé '.$_GET['titre']." <span class='badgenonvolant badge-success'>OK</span><br>" ;
 		$eqLogicaModifier->save();
-		echo '► Suppression de '.$eqLogicSauvegarde->getName()." <span class='badgenonvolant badge-success'>OK</span><br>" ;
-		$eqLogicSauvegarde->remove();						
 	} catch (Exception $e) {echo "<font color=#e0e2e2><B>Souci détecté</B></font> <span class='badgenonvolant badge-danger'>Echec</span><BR>";}
 
 

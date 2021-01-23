@@ -21,6 +21,7 @@ if (!isConnect('admin')) {
 
 ///$return = jeedom::getThemeConfig();
 //echo $return['current_desktop_theme'];
+	log::add('synologyapi', 'info', " ═══════════════════════[Lancement fenêtre assistant]═════════════════════════════════════════════════════════");
 
     $adresse = "";//$_SERVER['PHP_SELF'];
 	$arrayURL=array();
@@ -61,6 +62,10 @@ else {
 	$pass = config::byKey('Syno1_password','synologyapi');
 	$nomSynology = config::byKey('Syno1_name','synologyapi');
 	}
+	
+
+	
+	
 //$arrayGET=$_GET;
 //echo json_encode($_GET);
 /*
@@ -131,9 +136,12 @@ $hauteuriFrame="80%";
 			<span class="input-group-addon success" style="width: 140px">Méthode à utiliser</span>
 			<select id="Methode" class="form-control input-sm expressionAttr" style="width: 300px">
 				<option value="get" selected>Get</option>
+				<option value="system_get">System Get</option>
 				<option value="get_remote" >Get_remote</option>
 				<option value="query" >Query</option>
 				<option value="set" >Set</option>
+				<option value="update" >Update</option>
+				<option value="start" >Start</option>
 				<option value="check" >Check</option>
 				<option value="info" >Info</option>
 

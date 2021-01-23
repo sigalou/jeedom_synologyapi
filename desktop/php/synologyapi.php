@@ -5,6 +5,60 @@
 	$plugin = plugin::byId('synologyapi');
 	sendVarToJS('eqType', $plugin->getId());
 	$eqLogics = eqLogic::byType($plugin->getId());
+	
+	function afficheIcones($plugin, $eqLogics, $idSyno) {
+		foreach ($eqLogics as $eqLogic) {
+			// On recompte le nb de commandes pour actualiser les compteurs Info et Cmd
+			$compteurinfo=count($eqLogic->getCmd('info'));
+			$compteurcmd=0;
+			foreach ($eqLogic->getCmd('action') as $cmd) {
+				if ($cmd->getLogicalId() != "refresh") $compteurcmd++;
+			}
+			if (($compteurinfo != $eqLogic->getConfiguration('compteurinfo')) || ($compteurcmd != $eqLogic->getConfiguration('compteurcmd'))) {
+				$eqLogic->setConfiguration('compteurinfo', $compteurinfo);
+				$eqLogic->setConfiguration('compteurcmd', $compteurcmd);
+					if ($compteurinfo==0) 
+						$eqLogic->setConfiguration('type', 'cmd');
+					elseif ($compteurcmd==0) 
+						$eqLogic->setConfiguration('type', 'syno');
+					else
+						$eqLogic->setConfiguration('type', 'cmdinfo');					
+				$eqLogic->save();
+			}
+				if ($eqLogic->getConfiguration('devicetype') == $idSyno) {
+					if ($eqLogic->getConfiguration('type') == "cmd") {
+							if ($compteurcmd>1) $Salafin="s"; else $Salafin="" ;
+							$opacity = ($eqLogic->getIsEnable()) ? '' : 'disableCard';
+							echo '<div class="eqLogicDisplayCard cursor '.$opacity.'" data-eqLogic_id="' . $eqLogic->getId() . '">';
+							echo '<span class="badge badge-info">'.$compteurcmd.' Cmd'.$Salafin.'</span>';
+							echo '<img src="' . $plugin->getPathImgIcon() . '"/>';
+							echo '<br>';
+							echo '<span class="name" >'. $eqLogic->getHumanName(true, true) .'</span>';
+							echo '</div>';
+					}	elseif ($eqLogic->getConfiguration('type') == "cmdinfo") {
+							$opacity = ($eqLogic->getIsEnable()) ? '' : 'disableCard';
+							echo '<div class="eqLogicDisplayCard cursor '.$opacity.'" data-eqLogic_id="' . $eqLogic->getId() . '">';
+							echo '<span class="badge badge-info">'.$compteurcmd.'</span>';
+							echo '<span class="badgecentre badge-purple">'.$compteurinfo.'</span>';
+							echo '<img src="' . $plugin->getPathImgIcon() . '"/>';
+							echo '<br>';
+							echo '<span class="name" >'. $eqLogic->getHumanName(true, true) .'</span>';
+							echo '</div>';
+					}	else {	//type vaut syno					
+							if ($compteurinfo>1) $Salafin="s"; else $Salafin="" ;
+							$opacity = ($eqLogic->getIsEnable()) ? '' : 'disableCard';
+							echo '<div class="eqLogicDisplayCard cursor '.$opacity.'" data-eqLogic_id="' . $eqLogic->getId() . '">';
+							echo '<img src="' . $plugin->getPathImgIcon() . '"/>';
+							echo '<span class="badge badge-purple">'.$compteurinfo.' Info'.$Salafin.'</span>';
+							echo '<br>';
+							echo '<span class="name" >' . $eqLogic->getHumanName(true, true) . '</span>';
+							echo '</div>';
+					}
+				}
+		}
+	}
+
+	
 	?>
 <div class="row row-overflow">
 	<div class="col-xs-12 eqLogicThumbnailDisplay">
@@ -31,106 +85,30 @@
 	<legend ><i class="fas fa-cogs"></i> {{API de <?php echo config::byKey('Syno1_name','synologyapi')?>}}</legend>
 		<div class="eqLogicThumbnailContainer">
 		<?php
-			foreach ($eqLogics as $eqLogic) {
-				
-
-				// On recompte le nb de commandes pour actualiser les compteurs Info et Cmd
-				$compteurinfo=count($eqLogic->getCmd('info'));
-				$compteurcmd=0;
-				foreach ($eqLogic->getCmd('action') as $cmd) {
-					if ($cmd->getLogicalId() != "refresh") $compteurcmd++;
-				}
-				if (($compteurinfo != $eqLogic->getConfiguration('compteurinfo')) || ($compteurcmd != $eqLogic->getConfiguration('compteurcmd'))) {
-					$eqLogic->setConfiguration('compteurinfo', $compteurinfo);
-					$eqLogic->setConfiguration('compteurcmd', $compteurcmd);
-						if ($compteurinfo==0) 
-							$eqLogic->setConfiguration('type', 'cmd');
-						elseif ($compteurcmd==0) 
-							$eqLogic->setConfiguration('type', 'syno');
-						else
-							$eqLogic->setConfiguration('type', 'cmdinfo');					
-					$eqLogic->save();
-				}
-
-				
-				//echo "<br>".$eqLogic->getHumanName(true, true);
-					if ($eqLogic->getConfiguration('devicetype') == "1") {
-						//if ($eqLogic->getConfiguration('type') == "all") { pour le test de l'icone toutes les api
-						//echo $eqLogic->getConfiguration('type')."/";
-						if ($eqLogic->getConfiguration('type') == "cmd") {
-								if ($compteurcmd>1) $Salafin="s"; else $Salafin="" ;
-								$opacity = ($eqLogic->getIsEnable()) ? '' : 'disableCard';
-								echo '<div class="eqLogicDisplayCard cursor '.$opacity.'" data-eqLogic_id="' . $eqLogic->getId() . '">';
-								//echo '<img class="lazy" src="plugins/synologyapi/plugin_info//synologyapi_dev.png" style="min-height:75px !important;" />';
-								echo '<span class="badge badge-info">'.$compteurcmd.' Cmd'.$Salafin.'</span>';
-								echo '<img src="' . $plugin->getPathImgIcon() . '"/>';
-								echo '<br>';
-								echo '<span class="name" >'. $eqLogic->getHumanName(true, true) .'</span>';
-								echo '</div>';
-						}	elseif ($eqLogic->getConfiguration('type') == "cmdinfo") {
-								$opacity = ($eqLogic->getIsEnable()) ? '' : 'disableCard';
-								echo '<div class="eqLogicDisplayCard cursor '.$opacity.'" data-eqLogic_id="' . $eqLogic->getId() . '">';
-								//echo '<img class="lazy" src="plugins/synologyapi/plugin_info//synologyapi_dev.png" style="min-height:75px !important;" />';
-								echo '<span class="badge badge-info">'.$compteurcmd.'</span>';
-								echo '<span class="badgecentre badge-purple">'.$compteurinfo.'</span>';
-								echo '<img src="' . $plugin->getPathImgIcon() . '"/>';
-								echo '<br>';
-								echo '<span class="name" >'. $eqLogic->getHumanName(true, true) .'</span>';
-								echo '</div>';
-						}	else {	//type vaut syno					
-								if ($compteurinfo>1) $Salafin="s"; else $Salafin="" ;
-								$opacity = ($eqLogic->getIsEnable()) ? '' : 'disableCard';
-								echo '<div class="eqLogicDisplayCard cursor '.$opacity.'" data-eqLogic_id="' . $eqLogic->getId() . '">';
-								echo '<img src="' . $plugin->getPathImgIcon() . '"/>';
-								echo '<span class="badge badge-purple">'.$compteurinfo.' Info'.$Salafin.'</span>';
-								echo '<br>';
-								echo '<span class="name" >' . $eqLogic->getHumanName(true, true) . '</span>';
-								echo '</div>';
-						}
-					}
-			}
-			
+		afficheIcones($plugin,$eqLogics, "1");
 		echo "</div>";
 		
 		//-- -------------- deuxième SYNO ----------------
 		
-		if (config::byKey('Syno2_name','synologyapi')!="") {
+	if (config::byKey('Syno2_name','synologyapi')!="") {
 		?>
 		<legend ><i class="fas fa-cogs"></i> {{API de <?php echo config::byKey('Syno2_name','synologyapi')?>}}</legend>
 		<div class="eqLogicThumbnailContainer">
-			<?php
-				foreach ($eqLogics as $eqLogic) {
-						if ($eqLogic->getConfiguration('devicetype') == "2") {
-						$opacity = ($eqLogic->getIsEnable()) ? '' : 'disableCard';
-						echo '<div class="eqLogicDisplayCard cursor '.$opacity.'" data-eqLogic_id="' . $eqLogic->getId() . '">';
-						echo '<img src="' . $plugin->getPathImgIcon() . '"/>';
-						echo '<br>';
-						echo '<span class="name" >' . $eqLogic->getHumanName(true, true) . '</span>';
-						echo '</div>';
-						}
-				}
+		<?php
+		afficheIcones($plugin,$eqLogics, "2");
 		echo "</div>";
-		}
+	}
 			
 			//-- -------------- troisème SYNO ----------------
 			
-		if (config::byKey('Syno3_name','synologyapi')!="") {
+	if (config::byKey('Syno3_name','synologyapi')!="") {
 		?>
 		<legend ><i class="fas fa-cogs"></i> {{API de <?php echo config::byKey('Syno3_name','synologyapi')?>}}</legend>
 		<div class="eqLogicThumbnailContainer">
-			<?php
-				foreach ($eqLogics as $eqLogic) {
-						if ($eqLogic->getConfiguration('devicetype') == "3") {
-						$opacity = ($eqLogic->getIsEnable()) ? '' : 'disableCard';
-						echo '<div class="eqLogicDisplayCard cursor '.$opacity.'" data-eqLogic_id="' . $eqLogic->getId() . '">';
-						echo '<img src="' . $plugin->getPathImgIcon() . '"/>';
-						echo '<br>';
-						echo '<span class="name" style="color:#221916" >' . $eqLogic->getHumanName(true, true) . '</span>';
-						echo '</div>';
-						}
-				}
+		<?php
+		afficheIcones($plugin,$eqLogics, "3");
 		echo "</div>";
-		}
+	}
 				
 				?>
 	</div>
@@ -248,6 +226,7 @@
 					</fieldset>
 				</form>				
 				<legend><i class="fas fa-download" style="font-size : 2em;"></i> <span >{{Liste des informations à récupérer}}</span></legend>
+				<a class="btn btn-info btn-sm eqLogicAction pull-right" onclick="ouvreModalavecAPI();" ><i class="fas fa-edit"></i> {{Modifier dans l'Assistant}}</a>
 			
 				<!--<a class="btn btn-success btn-sm cmdAction pull-right" data-action="add" style="margin-top:5px;"><i class="fa fa-plus-circle"></i> {{Commandes}}</a><br/><br/>-->
 				<table class="table-condensed" border=0 width=100%><tr><th style="width: 530px;">{{  Nom}}</th><th style="width: 400px;">{{  Chemin de la donnée à récupérer}}</th><th class="text-center" style="width:290px;">Options</th></tr></table>

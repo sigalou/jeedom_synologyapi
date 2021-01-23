@@ -20,6 +20,7 @@ $idsynology=$_GET['idsynology'];
 //echo "<br>Limite : ".$_GET['limit']; 
 //echo "<br>Masque échecs : ".$_GET['cache_errors']; 
 
+	log::add('synologyapi', 'info', " ╔══════════════════════[Lancement requète]═════════════════════════════════════════════════════════");
 
 
 function getURI(){
@@ -45,14 +46,20 @@ function getURI(){
   //recupereDonneesJson ($sid,"SYNO.Core.CurrentConnection","list&start=0&limit=50&sort_by=%22time%22&sort_direction=%22DESC%22&offset=0&action=%22enum%22",$server,$arrContextOptions);
   
   
-//echo "<br>API : ".$API; 
+//echo "<br>sid : ".$sid; 
 //echo "<br>parametresAPI : ".$parametresAPI; 
 //echo "<br>parameters : ".$parameters; 
 
- 
+ if ($sid != "") { // Login FAILED
 	$obj_Data=synologyapi::recupereDonneesJson ($sid, $parametresAPI, $parameters, $idsynology);
-	log::add('synologyapi', 'debug', 'résultat: '.json_encode($obj_Data));		
+	log::add('synologyapi', 'debug', '╠═ Résultat: '.json_encode($obj_Data));		
 	$inforetour=traiteDonneesJson ($API, $obj_Data, $idsynology, $parametresAPI, $method, $eqLogics);
+	log::add('synologyapi', 'info', ' ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════');
+
+	} else {
+		log::add('synologyapi', 'info', ' ╚═══════════════════════Echec de login═════════════════════════════════════════════════════════════════════');
+		echo "<br>► <span class='badge-warning'> Echec de Login au Synology N° ".$idsynology." </span>      <span class='badgenonvolant badge-danger'>Echec</span>"; 
+	}		
 
 ?>
 <script>
@@ -113,7 +120,7 @@ function traiteDonneesJson ($API,$obj_coreData,$idsynology, $parametresAPI, $met
 	
 	$nomBoutonVert="Sauvegarder";
 	if ($obj_coreData['success']== true) {
-		if ($method =="set") {
+		if (($method =="set") || ($method =="update") || ($method =="start")) {
 			//log::add('synologyapi', 'debug', 'method!!!!!!!!!**!!!: '.$method);	
 			$autresParametres=str_replace("?v=d&plugin=synologyapi&modal=testAPI", "", str_replace("&idsynology=1&","",str_replace("&idsynology=2&","",str_replace("&idsynology=3&","",str_replace("SYNO.", "", $parametresAPI)))));
 			//echo "<br>autresParametres : ".$autresParametres; 

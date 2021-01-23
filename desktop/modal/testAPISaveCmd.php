@@ -123,7 +123,7 @@ $eqLogics = synologyapi::byType('synologyapi');
 
 			foreach ($group->getCmd() as $cmdAtester) {
 				if ($cmdAtester->getName() == $nouvelleCmd) {
-				echo "► <span class='badge-warning'>Une commande porte déja le nom : ".$nouvelleCmd."</span>      <span class='badgenonvolant badge-danger'>Echec</span><br>Dans l'écran précédent, choisissez un autre nom de commande.<br>"; 
+				echo "<br>► <span class='badge-warning'> Une commande porte déja le nom : ".$nouvelleCmd." </span>      <span class='badgenonvolant badge-danger'>Echec</span><br>Dans l'écran précédent, choisissez un autre nom de commande.<br>"; 
 				exit();	
 				}
 			}
