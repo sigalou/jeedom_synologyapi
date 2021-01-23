@@ -212,6 +212,7 @@ public static function update() {
 					//log::add('synologyapi', 'debug', '[Mise à jour de] '.$cmd->getName()." (".$cmd->getConfiguration('requestAPI').")");
 					
 					$syntaxedeBase=$cmd->getConfiguration('requestAPI');
+					$calcul=$cmd->getConfiguration('calcul');
 					$nbdeNiveaux=mb_substr_count($syntaxedeBase, "|");
 					$parchamps = explode("|", $syntaxedeBase);
 					//log::add('synologyapi', 'debug', '[syntaxedeBase] '.$syntaxedeBase);
@@ -250,7 +251,26 @@ public static function update() {
 					if ($value === true  ) $value="true";
 					//log::add('synologyapi', 'debug', '[value] '.$value);
 					
-					log::add('synologyapi', 'info', " ╠═ ".$cmd->getName()." = ".$value);
+
+
+					
+					if ($calcul=='') {
+					log::add('synologyapi', 'info', " ╠═══ ".$cmd->getName()." = ".$value);
+					
+					}
+					else {
+					log::add('synologyapi', 'info', " ╠═╦═ ".$cmd->getName()." = ".$value);
+							try {
+								$expression=str_replace('#value#', '"'.$value.'"', $calcul);
+								$value = jeedom::evaluateExpression($expression);
+								if(is_string($value)){
+									$value = str_replace('"', '', $value);
+									log::add('synologyapi', 'info', " ║ ╚═ Calcul de ".$expression." = ".$value);
+								}
+							} catch (Exception $e) {
+								log::add('synologyapi', 'info', " ║ ╚═ Echec de calcul :".$e->getMessage());
+							}					
+					}
 
 					//log::add('synologyapi', 'debug', '[valeur] '.$cmd->getName()." : ".$value);
 					$synologyapi->checkAndUpdateCmd($cmd,$value);
@@ -604,6 +624,9 @@ class synologyapiCmd extends cmd {
 		log::add('synologyapi', 'info', ' ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════');
             return;
         }
+	 
+	 
+	 
 	 
     if ($this->getType() != 'action') return;
 	

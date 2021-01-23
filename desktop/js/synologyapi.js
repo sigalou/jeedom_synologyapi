@@ -313,7 +313,7 @@ function addCmdToTable(_cmd) {
   
   
   if (init(_cmd.logicalId) == 'refresh') {
-    var tr = '<tr class="cmd" data-cmd_id="' + init(_cmd.id) + '" virtualAction="' + init(_cmd.configuration.virtualAction) + '">';
+    var tr = '<tr style="border-bottom: 1px solid #808080;" class="cmd" data-cmd_id="' + init(_cmd.id) + '" virtualAction="' + init(_cmd.configuration.virtualAction) + '">';
 		
 		tr += '<td width=400px>';
  tr += '<span class="cmdAttr" data-l1key="id" style="display:none;"></span>';
@@ -360,7 +360,7 @@ function addCmdToTable(_cmd) {
   
   if (init(_cmd.type) == 'info') {
 	  
-    var tr = '<tr class="cmd" data-cmd_id="' + init(_cmd.id) + '" virtualAction="' + init(_cmd.configuration.virtualAction) + '">';
+    var tr = '<tr style="border-bottom: 1px solid #808080;" class="cmd" data-cmd_id="' + init(_cmd.id) + '" virtualAction="' + init(_cmd.configuration.virtualAction) + '">';
 		
 		tr += '<td width=400px>';
  tr += '<span class="cmdAttr" data-l1key="id" style="display:none;"></span>';
@@ -374,18 +374,19 @@ function addCmdToTable(_cmd) {
     tr += '<td>';
     tr += '<input class="cmdAttr form-control input-sm" data-l1key="name" style="width : 140px;" placeholder="{{Nom}}"></td>';*/
     tr += '</td>';
-    tr += '<td width=130>';
+    tr += '<td width=130  >';
     tr += '<input class="cmdAttr form-control type input-sm" data-l1key="type" value="info" disabled style="margin-bottom : 5px;" />';
     tr += '<span class="subType" subType="' + init(_cmd.subType) + '"></span>';
     tr += '</td>';
 	    tr += '<td width=400>' +
-      '<input style="margin-bottom : 30px;" class="cmdAttr form-control input-sm"';
+      '<input style="margin-bottom : 2px;" class="cmdAttr form-control input-sm"';
     if (init(_cmd.logicalId) != "")
       tr += 'readonly';
 
     if (init(_cmd.logicalId) == "refresh")
       tr += ' style="display:none;" ';
     tr += ' data-l1key="configuration" data-l2key="requestAPI">';
+     tr += '<input  class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="calcul" placeholder="{{Calcul facultatif, utiliser #value# pour utiliser la valeur récupérée}}">';
     tr += '<td width=190>';
     tr += '<input class="tooltips cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="minValue" placeholder="{{Min}}" title="{{Min}}" style="width:30%;display:inline-block;">';
     tr += '<input class="tooltips cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="maxValue" placeholder="{{Max}}" title="{{Max}}" style="width:30%;display:inline-block;">';
@@ -412,7 +413,7 @@ function addCmdToTable(_cmd) {
   }
   
    if (init(_cmd.type) == 'API') {
-    var tr = '<tr class="cmd" data-cmd_id="' + init(_cmd.id) + '" virtualAction="' + init(_cmd.configuration.virtualAction) + '">';
+    var tr = '<tr style="border-bottom: 1px solid #808080;" class="cmd" data-cmd_id="' + init(_cmd.id) + '" virtualAction="' + init(_cmd.configuration.virtualAction) + '">';
     //tr += '<td>';
   //  tr += '<small><small><span class="cmdAttr" data-l1key="id"></span></small></small>';
    // tr += '</td>';
@@ -455,7 +456,7 @@ function addCmdToTable(_cmd) {
   if (init(_cmd.type) == 'action') {
 
 			//var tr = '<tr class="cmd" >'; //la couleur ne foncitonne pas à cause de info mais on ne peut pas supprimer info
-    var tr = '<tr class="cmd" data-cmd_id="' + init(_cmd.id) + '" virtualAction="' + init(_cmd.configuration.virtualAction) + '">';
+    var tr = '<tr style="border-bottom: 1px solid #808080;" class="cmd" data-cmd_id="' + init(_cmd.id) + '" virtualAction="' + init(_cmd.configuration.virtualAction) + '">';
 		
 		tr += '<td width=400>';
  tr += '<span class="cmdAttr" data-l1key="id" style="display:none;"></span>';
