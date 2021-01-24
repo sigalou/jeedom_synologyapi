@@ -213,9 +213,9 @@ $hauteuriFrame="80%";
 		else 					document.getElementById("autreMethode").type = "hidden";
 		
 	document.getElementById("Info").checked = true;
-	if (Methode=="set") document.getElementById("Cmd").checked = true;
-	if (Methode=="update") document.getElementById("Cmd").checked = true;
-	if (Methode=="start") document.getElementById("Cmd").checked = true;
+	if (Methode=="set") document.getElementById("Action").checked = true;
+	if (Methode=="update") document.getElementById("Action").checked = true;
+	if (Methode=="start") document.getElementById("Action").checked = true;
 
 	}
 		
