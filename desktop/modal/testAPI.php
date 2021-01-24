@@ -17,6 +17,7 @@ $API=$_GET['api'];
 $method=$_GET['method'];
 $parameters=$_GET['Parametres'];
 $idsynology=$_GET['idsynology'];
+$typeCmdInfo=$_GET['typeCmdInfo'];
 //echo "<br>Limite : ".$_GET['limit']; 
 //echo "<br>Masque échecs : ".$_GET['cache_errors']; 
 
@@ -53,7 +54,7 @@ function getURI(){
  if ($sid != "") { // Login FAILED
 	$obj_Data=synologyapi::recupereDonneesJson ($sid, $parametresAPI, $parameters, $idsynology);
 	log::add('synologyapi', 'debug', '╠═ Résultat: '.json_encode($obj_Data));		
-	$inforetour=traiteDonneesJson ($API, $obj_Data, $idsynology, $parametresAPI, $method, $eqLogics);
+	$inforetour=traiteDonneesJson ($API, $obj_Data, $idsynology, $parametresAPI, $method, $eqLogics, $typeCmdInfo);
 	log::add('synologyapi', 'info', ' ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════');
 
 	} else {
@@ -108,7 +109,7 @@ function actionCaseCocher(laCase, API) {
 };</script>
 <?php
 
-function traiteDonneesJson ($API,$obj_coreData,$idsynology, $parametresAPI, $method, $eqLogics)
+function traiteDonneesJson ($API,$obj_coreData,$idsynology, $parametresAPI, $method, $eqLogics, $typeCmdInfo)
 {
 
 //On va tester si l'API a renvoyé une erreur (xx enregistrements) ou si ça a fonctionné
@@ -120,7 +121,8 @@ function traiteDonneesJson ($API,$obj_coreData,$idsynology, $parametresAPI, $met
 	
 	$nomBoutonVert="Sauvegarder";
 	if ($obj_coreData['success']== true) {
-		if (($method =="set") || ($method =="update") || ($method =="start")) {
+//		if (($method =="set") || ($method =="update") || ($method =="start")) {
+		if ($typeCmdInfo =="Action") {
 			//log::add('synologyapi', 'debug', 'method!!!!!!!!!**!!!: '.$method);	
 			$autresParametres=str_replace("?v=d&plugin=synologyapi&modal=testAPI", "", str_replace("&idsynology=1&","",str_replace("&idsynology=2&","",str_replace("&idsynology=3&","",str_replace("SYNO.", "", $parametresAPI)))));
 			//echo "<br>autresParametres : ".$autresParametres; 

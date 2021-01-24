@@ -125,31 +125,8 @@ $hauteuriFrame="80%";
 			
 			?>
 			</select></div>	</div>&nbsp;&nbsp;&nbsp;<?php echo "<FONT COLOR=#8dc935><i><small>".count($listeAPI['data'])." API disponibles</i></small>";?>
-	</td><td></td><td>
-
-
-
-
-	</td></tr><tr><td BGCOLOR=#646464>
-	<div class="input-group " style="float:left">
-		<div class="input-group ">
-			<span class="input-group-addon success" style="width: 140px">Méthode à utiliser</span>
-			<select id="Methode" class="form-control input-sm expressionAttr" style="width: 300px">
-				<option value="get" selected>Get</option>
-				<option value="system_get">System Get</option>
-				<option value="get_remote" >Get_remote</option>
-				<option value="query" >Query</option>
-				<option value="set" >Set</option>
-				<option value="update" >Update</option>
-				<option value="start" >Start</option>
-				<option value="check" >Check</option>
-				<option value="info" >Info</option>
-
-			</select>
-			<a class="btn btn-success btn-sm bt_lancerRequete">{{&nbsp;&nbsp;&nbsp;Lancer la requête&nbsp;&nbsp;&nbsp;}} </a>	
-	</div>	
-	</div>
 	</td><td>&nbsp;ou&nbsp;</td><td>
+
 
 	<div class="input-group " style="float:left">
 
@@ -164,7 +141,35 @@ $hauteuriFrame="80%";
 
 			</select>
 			
+	</div>
+
+	</td></tr><tr><td BGCOLOR=#646464>
+	<div class="input-group " >
+			<span class="input-group-addon success" style="width: 140px">Méthode à utiliser</span>
+			<select id="Methode" onchange="changeMethode();"class="form-control input-sm expressionAttr" style="width: 100px">
+				<option value="get" selected>Get</option>
+				<option value="system_get">System Get</option>
+				<option value="get_remote" >Get_remote</option>
+				<option value="query" >Query</option>
+				<option value="set" >Set</option>
+				<option value="update" >Update</option>
+				<option value="start" >Start</option>
+				<option value="check" >Check</option>
+				<option value="info" >Info</option>
+				<option value="autre" >Autre...</option>
+
+			</select>&nbsp;
+			<input id="autreMethode" style="width: 170px;height: 28px;" type="hidden" class="form-control" name="autreMethode" placeholder="Ajouter votre méthode">&nbsp;
+	<input type="radio" id="Action"  name="typeCmdInfo" value="Action" > Action&nbsp;
+	<input type="radio" id="Info" name="typeCmdInfo" value="Info" checked> Info
+
+</div>
+			
 	</div>	
+	</div>
+	</td><td></td><td>
+
+	
 
 	</td></tr><tr><td BGCOLOR=#646464>
 
@@ -175,7 +180,7 @@ $hauteuriFrame="80%";
 
 	</div>
 
-	</td></tr></table>
+	</td><td></td><td align=center><a class="btn btn-success btn-sm bt_lancerRequete">{{&nbsp;&nbsp;&nbsp;Lancer la requête&nbsp;&nbsp;&nbsp;}} </a>	</td></tr></table>
 	</form>
 
 <?php } // fin de test de la source
@@ -183,7 +188,9 @@ $hauteuriFrame="80%";
 
 <script>
 	$('.bt_lancerRequete').off('click').on('click', function() {
-  window.parent.document.getElementById('moniframe').src = 'index.php?v=d&plugin=synologyapi&modal=testAPI&idsynology='+document.getElementById('idsynology').value+'&api='+document.getElementById('API').value+"&method="+document.getElementById('Methode').value+document.getElementById('Parametres').value;
+	var typeCmdInfo="Action";
+	if (document.getElementById('Info').checked) typeCmdInfo="Info";
+  window.parent.document.getElementById('moniframe').src = 'index.php?v=d&plugin=synologyapi&modal=testAPI&idsynology='+document.getElementById('idsynology').value+'&api='+document.getElementById('API').value+"&typeCmdInfo="+typeCmdInfo+"&method="+document.getElementById('Methode').value+document.getElementById('Parametres').value;
 	});
 
 	function lanceAPI() {document.getElementById('moniframe').src = 'index.php?v=d&plugin=synologyapi&modal=testAPI&'+"idsynology="+document.getElementById('idsynology').value+"&"+document.getElementById('APIProposees').value;};
@@ -199,7 +206,19 @@ $hauteuriFrame="80%";
 		$('#md_modal').dialog({title: "{{Routines}}"});
 		$('#md_modal').load('index.php?v=d&plugin=synologyapi&modal=req&idsynology='+urlAOuvrir).dialog('open');
 		};
+		
+	function changeMethode() {
+	var Methode = document.getElementById('Methode').value;
+		if (Methode=="autre") 	document.getElementById("autreMethode").type = "text";
+		else 					document.getElementById("autreMethode").type = "hidden";
+		
+	document.getElementById("Info").checked = true;
+	if (Methode=="set") document.getElementById("Cmd").checked = true;
+	if (Methode=="update") document.getElementById("Cmd").checked = true;
+	if (Methode=="start") document.getElementById("Cmd").checked = true;
 
+	}
+		
 window.closeModal = function(){
 	$('#md_modal').dialog('close');
 	window.location.reload();
