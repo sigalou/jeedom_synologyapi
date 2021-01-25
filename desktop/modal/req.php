@@ -190,7 +190,7 @@ $hauteuriFrame="80%";
 	$('.bt_lancerRequete').off('click').on('click', function() {
 	var typeCmdInfo="Action";
 	if (document.getElementById('Info').checked) typeCmdInfo="Info";
-  window.parent.document.getElementById('moniframe').src = 'index.php?v=d&plugin=synologyapi&modal=testAPI&idsynology='+document.getElementById('idsynology').value+'&api='+document.getElementById('API').value+"&typeCmdInfo="+typeCmdInfo+"&method="+document.getElementById('Methode').value+document.getElementById('Parametres').value;
+  window.parent.document.getElementById('moniframe').src = 'index.php?v=d&plugin=synologyapi&modal=testAPI&idsynology='+document.getElementById('idsynology').value+'&api='+document.getElementById('API').value+"&typeCmdInfo="+typeCmdInfo+"&method="+document.getElementById('Methode').value+"&autreMethode="+document.getElementById('autreMethode').value+document.getElementById('Parametres').value;
 	});
 
 	function lanceAPI() {document.getElementById('moniframe').src = 'index.php?v=d&plugin=synologyapi&modal=testAPI&'+"idsynology="+document.getElementById('idsynology').value+"&"+document.getElementById('APIProposees').value;};

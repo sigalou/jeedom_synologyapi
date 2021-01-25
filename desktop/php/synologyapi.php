@@ -112,10 +112,13 @@
 				
 				?>
 	</div>
-	<div class="col-lg-12 eqLogic" style="display: none;">
+	<div id="toutDevice" class="col-lg-12 eqLogic" style="display: none;">
 		<div class="input-group pull-right" style="display:inline-flex">
 			<span class="input-group-btn">
-			<a class="btn btn-default btn-sm eqLogicAction roundedLeft" data-action="configure"><i class="fa fa-cogs"></i> {{Configuration avancée}}</a><a class="btn btn-sm btn-success eqLogicAction" data-action="save"><i class="fas fa-check-circle"></i> {{Sauvegarder}}</a><a class="btn btn-danger btn-sm eqLogicAction roundedRight" data-action="remove"><i class="fas fa-minus-circle"></i> {{Supprimer}}</a>
+			<a class="btn btn-default btn-sm eqLogicAction roundedLeft" data-action="configure"><i class="fa fa-cogs"></i> {{Configuration avancée}}</a>
+			<span class="btn btn-info btn-sm btn-file"><i class="fas fa-file-import"></i><span class="hidden-xs">{{Importer}}</span><input  id="bt_importSYNODevice" type="file" name="file" style="display:inline-block;">
+      </span><a class="btn btn-info btn-sm" id="bt_exportSYNODevice"><i class="fas fa-file-export"></i> <span class="hidden-xs">{{Exporter}}</span>
+			<a class="btn btn-sm btn-success eqLogicAction" data-action="save"><i class="fas fa-check-circle"></i> {{Sauvegarder}}</a><a class="btn btn-danger btn-sm eqLogicAction roundedRight" data-action="remove"><i class="fas fa-minus-circle"></i> {{Supprimer}}</a>
 			</span>
 		</div>
 		<span style="position:relative;top:+5px;left:+5px;visibility:collapse;" class="eqLogicAttr" data-l1key="configuration" id="typefield" data-l2key="type"> </span>
@@ -145,6 +148,12 @@
 		<div class="tab-content">
 		<!---------------- Onglet Equipement ---------------->  
 			<div role="tabpanel" class="tab-pane " id="TabInfo">
+		
+			
+
+			
+			
+			
 				<form class="form-horizontal">
 					<fieldset><br><br>
 						<div class="form-group">

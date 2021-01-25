@@ -39,6 +39,55 @@ require_once __DIR__  . '/../../../../core/php/core.inc.php';
 
 class synologyapi extends eqLogic {
     /*     * *************************Attributs****************************** */
+    public static function templateWidget()
+    {
+        $return = array('info' => array('string' => array(), 'numeric' => array()));
+        $return['info']['string']['Safe_Risk'] = array(
+            'template' => 'tmplmultistate',
+            'replace' => array("#_time_widget_#" => "0","#_desktop_width_#" => "","#_mobile_width_#" => ""),
+            'test' => array(
+                array(
+                    'operation' => "#value#==\"safe\"",
+                    'state_light' => "<i class='fas fa-check-circle  icon_green'></i>",
+                    'state_dark' => "<i class='fas fa-check-circle  icon_green'></i>"
+                ),
+                array(
+                    'operation' => "#value#==\"risk\"",
+                    'state_light' => "<i class=\"fas fa-exclamation-circle icon_red\"></i>",
+                    'state_dark' => "<i class=\"fas fa-exclamation-circle icon_red\"></i>"
+                ),
+                array(
+                    'operation' => "#value#==\"outOfDate\"",
+                    'state_light' => "<i class=\"fas fa-exclamation-circle icon_orange\"></i>",
+                    'state_dark' => "<i class=\"fas fa-exclamation-circle icon_orange\"></i>"
+                )
+            )
+        );
+        $return['info']['string']['WifiOnOff'] = array(
+            'template' => 'tmplmultistate',
+            'replace' => array("#_time_widget_#" => "0","#_desktop_width_#" => "","#_mobile_width_#" => ""),
+            'test' => array(
+                array(
+                    'operation' => "#value#!=\"true\"",
+                    'state_light' => "<i class='icon maison-man337 icon_green'></i>",
+                    'state_dark' => "<i class='icon maison-man337 icon_green'></i>"
+                ),
+                array(
+                    'operation' => "#value#==\"true\"",
+                    'state_light' => "<i class='icon jeedomapp-lock-ferme icon_red'></i>",
+                    'state_dark' => "<i class='icon jeedomapp-lock-ferme icon_red'></i>"
+                )
+            )
+        );        return $return;
+    }
+
+
+
+
+
+
+
+
     
   /*
    * Permet de définir les possibilités de personnalisation du widget (en cas d'utilisation de la fonction 'toHtml' par exemple)
@@ -558,6 +607,7 @@ $arrContextOptions=array(
 						$refresh->setType('action');
 						$refresh->setSubType('other');
 	                    $refresh->setOrder('99');
+						$refresh->setConfiguration('requestAPI', "refresh"); //pour export json
 						$refresh->setEqLogic_id($this->getId());
 						$refresh->save();
                 }

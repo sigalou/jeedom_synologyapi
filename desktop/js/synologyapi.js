@@ -32,6 +32,65 @@ $('#gotofusionner').off('click').on('click', function () {
   $('#md_modal').load('index.php?v=d&plugin=synologyapi&modal=fusionner&idsynology=1&api=SYNO.Core.System.Utilization&method=get').dialog('open');
 });
 
+
+
+$("#bt_exportSYNODevice").on('click', function(event) {
+ // var widgets = $('.eqlogic').getValues('.eqLogicAttr')[0]
+ 
+
+// var eqLogic = $(this).getValues('.eqLogicAttr')
+  //    eqLogic = eqLogic
+  
+  
+var equipement= $("#toutDevice").getValues('.eqLogicAttr')[0];
+//equipement.id = ""
+delete equipement.id
+delete equipement.object_id
+delete equipement.category
+delete equipement.isEnable
+delete equipement.isVisible
+var commandes= $("#toutDevice").getValues('.cmdAttr')[0];
+delete commandes.id
+delete commandes.isVisible
+//var eqLogic=equipement+commandes;
+  var eqLogic = $.extend(equipement, commandes); 
+ 
+  /*
+   var eqLogics = []
+  $('.eqLogic').each(function() {
+    if ($(this).is(':visible')) {
+      var eqLogic = $(this).getValues('.eqLogicAttr')
+      eqLogic = eqLogic[0]
+      eqLogic.cmd = $(this).find('.cmd').getValues('.cmdAttr')
+      if ('function' == typeof (saveEqLogic)) {
+        //eqLogic = saveEqLogic(eqLogic)
+      }
+      //eqLogics.push(eqLogic)
+    }
+  }) 
+  */
+  
+  
+  
+  
+  
+  //widgets.test = $('#div_templateTest .test').getValues('.testAttr')
+  //widgets.id = ""
+      downloadObjectAsJson(eqLogic, "export")
+  return false
+}) 
+
+function downloadObjectAsJson(exportObj, exportName) {
+  var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObj))
+  var downloadAnchorNode = document.createElement('a')
+  downloadAnchorNode.setAttribute("href",     dataStr)
+  downloadAnchorNode.setAttribute("target", "_blank")
+  downloadAnchorNode.setAttribute("download", exportName + ".json")
+  document.body.appendChild(downloadAnchorNode) // required for firefox
+  downloadAnchorNode.click()
+  downloadAnchorNode.remove()
+}
+
 // On passe d'un device All à un device Syno
 /*
 function typeChange(){
@@ -323,10 +382,18 @@ function addCmdToTable(_cmd) {
 
 
     tr += '<td>';
-    tr += '<input style="margin-bottom : 30px;" class="cmdAttr form-control type input-sm" data-l1key="type" value="action" disabled />';
-    tr += '<div ' + DefinitionDivPourCommandesPredefinies + '>';
-    tr += '<span class="subType" subType="' + init(_cmd.subType) + '"></span>';
-    tr += '</div>';
+    //tr += '<input style="margin-bottom : 30px;" class="cmdAttr form-control type input-sm" data-l1key="type" value="action" disabled />';
+	
+	tr += '<input type="hidden" class="cmdAttr form-control type input-sm" data-l1key="type" value="action" />';
+	tr += '<input type="hidden" class="cmdAttr form-control type input-sm" data-l1key="subType"/>';
+	tr += '<input type="hidden" class="cmdAttr form-control type input-sm" data-l1key="configuration" data-l2key="requestAPI" value="rrrrien"/>';
+
+	
+	
+	
+  //  tr += '<div ' + DefinitionDivPourCommandesPredefinies + '>';
+  //  tr += '<span class="subType" subType="' + init(_cmd.subType) + '"></span>';
+  //  tr += '</div>';
 
 
 
@@ -380,13 +447,15 @@ function addCmdToTable(_cmd) {
     tr += '</td>';
 	    tr += '<td width=400>' +
       '<input style="margin-bottom : 2px;" class="cmdAttr form-control input-sm"';
+	  
     if (init(_cmd.logicalId) != "")
       tr += 'readonly';
 
-    if (init(_cmd.logicalId) == "refresh")
-      tr += ' style="display:none;" ';
+  //  if (init(_cmd.logicalId) == "refresh") 
+ //     tr += ' style="display:none;" ';
+	  
     tr += ' data-l1key="configuration" data-l2key="requestAPI">';
-     tr += '<input  class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="calcul" placeholder="{{Calcul facultatif, utiliser #value# pour utiliser la valeur récupérée}}">';
+    tr += '<input  class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="calcul" placeholder="{{Calcul facultatif, utiliser #value# pour utiliser la valeur récupérée}}">';
     tr += '<td width=190>';
     tr += '<input class="tooltips cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="minValue" placeholder="{{Min}}" title="{{Min}}" style="width:30%;display:inline-block;">';
     tr += '<input class="tooltips cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="maxValue" placeholder="{{Max}}" title="{{Max}}" style="width:30%;display:inline-block;">';
@@ -484,10 +553,16 @@ function addCmdToTable(_cmd) {
     tr += '<div ' + DefinitionDivPourCommandesPredefinies + '>';
     tr += '<span class="subType" subType="' + init(_cmd.subType) + '"></span>';
     tr += '</div></td>';*/
-    tr += '<td><input class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="request"></td>';
+    tr += '<td><input class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="request">';
+	
+	tr += '<input type="hidden" class="cmdAttr form-control type input-sm" data-l1key="type" value="action" />';
+	tr += '<input type="hidden" class="cmdAttr form-control type input-sm" data-l1key="subType"/>';
+	tr += '<input type="hidden" class="cmdAttr form-control type input-sm" data-l1key="configuration" data-l2key="requestAPI" value="rien"/>';
+
+	
 
 
-    tr +=   '<td width=90><label class="checkbox-inline"><input type="checkbox" class="cmdAttr checkbox-inline" data-l1key="isVisible" checked/>{{Afficher}}</label>' +
+    tr +=   '</td><td width=90><label class="checkbox-inline"><input type="checkbox" class="cmdAttr checkbox-inline" data-l1key="isVisible" checked/>{{Afficher}}</label>' +
       '</td>' +
       '<td width=150>';
 

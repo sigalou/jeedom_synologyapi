@@ -15,6 +15,7 @@ if (!isConnect('admin')) {
 // ********** LOGIN ************
 $API=$_GET['api'];
 $method=$_GET['method'];
+$autreMethode=$_GET['autreMethode'];
 $parameters=$_GET['Parametres'];
 $idsynology=$_GET['idsynology'];
 $typeCmdInfo=$_GET['typeCmdInfo'];
@@ -23,11 +24,17 @@ $typeCmdInfo=$_GET['typeCmdInfo'];
 
 	log::add('synologyapi', 'info', " ╔══════════════════════[Lancement requète]═════════════════════════════════════════════════════════");
 
+//if ($method=="autre") $method=$autreMethode;
+
 
 function getURI(){
     $adresse = "";$_SERVER['PHP_SELF'];
     $i = 0;
     foreach($_GET as $cle => $valeur){
+
+		if ($cle=='autreMethode') continue;
+		if (($cle=='method') && ($valeur=='autre')) $valeur=$_GET['autreMethode'];
+		//log::add('synologyapi', 'debug', '*********************'.$valeur."--------".$cle);		
         $adresse .= ($i == 0 ? '?' : '&').$cle.($valeur ? '='.$valeur : '');
         $i++;
     }
