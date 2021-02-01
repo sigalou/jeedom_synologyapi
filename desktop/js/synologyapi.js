@@ -32,53 +32,193 @@ $('#gotofusionner').off('click').on('click', function () {
   $('#md_modal').load('index.php?v=d&plugin=synologyapi&modal=fusionner&idsynology=1&api=SYNO.Core.System.Utilization&method=get').dialog('open');
 });
 
+//$('#importer').off('click').on('click', function () {
+
+$("#bt_importSYNODevice1").change(function(event) {
+  BoutonImport("1", event);
+})
+
+$("#bt_importSYNODevice2").change(function(event) {
+  BoutonImport("2", event);
+})
+
+$("#bt_importSYNODevice3").change(function(event) {
+  BoutonImport("3", event);
+})
+
+function BoutonImport(idSyno, event) {
+	$('#div_alert').hide()
+	var uploadedFile = event.target.files[0]
+	if(uploadedFile.type !== "application/json") {
+		$('#div_alert').showAlert({message: "{{L'import se fait au format json à partir d'API précedemment exportées.}}", level: 'danger'})
+		return false
+	}
+	if (uploadedFile) {
+		var readFile = new FileReader()
+		readFile.readAsText(uploadedFile)
+		readFile.onload = function(e) {
+			var objectDataTous = JSON.parse(e.target.result)
+			var objectData = JSON.stringify(objectDataTous)
+			bootbox.prompt("{{Nom du nouvel équipement :}}", function(result) {
+				if (result !== null) {
+				  jeedom.eqLogic.save({
+					type: eqType,
+					eqLogics: [{name: result}],
+					error: function(error) {
+					  $('#div_alert').showAlert({message: error.message, level: 'danger'});
+					},
+					success: function(_data) {
+					importerJson(_data.id, idSyno, objectData);
+					  var vars = getUrlVars()
+					  var url = 'index.php?'
+					  for (var i in vars) {
+						if (i != 'id' && i != 'saveSuccessFull' && i != 'removeSuccessFull') {
+						  url += i + '=' + vars[i].replace('#', '') + '&'
+						}
+					  }
+					  modifyWithoutSave = false
+					  url += 'id=' + _data.id + '&saveSuccessFull=1'
+					  //loadPage(url) non utile, supprimé pour éviter que le redresh ne prenne pas les nouvelles commandes
+					}
+				  })
+				}
+			})
+		}
+	} else {
+		$('#div_alert').showAlert({message: "{{Problème lors de la lecture du fichier.}}", level: 'danger'})
+		return false
+	}		
+}
+
+
+ 
+ 
+function importerJson(id, idSyno, objectData) {
+	
+  $.ajax({
+    type: "POST",
+    url: "plugins/synologyapi/core/ajax/synologyapi.ajax.php",
+    data: {
+      action: "importerJson",
+      id: id,
+      objectData: objectData,
+      idSyno: idSyno
+    },
+    dataType: 'json',
+    error: function (request, status, error) {
+      handleAjaxError(request, status, error);
+    },
+    success: function (data) {
+      if (data.state != 'ok') {
+        $('#div_alert').showAlert({
+          message: data.result,
+          level: 'danger'
+        });
+        return;
+      }
+      window.location.reload();
+    }
+  });
+}
+
 
 
 $("#bt_exportSYNODevice").on('click', function(event) {
- // var widgets = $('.eqlogic').getValues('.eqLogicAttr')[0]
- 
 
-// var eqLogic = $(this).getValues('.eqLogicAttr')
-  //    eqLogic = eqLogic
-  
-  
-var equipement= $("#toutDevice").getValues('.eqLogicAttr')[0];
-//equipement.id = ""
-delete equipement.id
-delete equipement.object_id
-delete equipement.category
-delete equipement.isEnable
-delete equipement.isVisible
-var commandes= $("#toutDevice").getValues('.cmdAttr')[0];
-delete commandes.id
-delete commandes.isVisible
-//var eqLogic=equipement+commandes;
-  var eqLogic = $.extend(equipement, commandes); 
- 
-  /*
-   var eqLogics = []
-  $('.eqLogic').each(function() {
-    if ($(this).is(':visible')) {
-      var eqLogic = $(this).getValues('.eqLogicAttr')
-      eqLogic = eqLogic[0]
-      eqLogic.cmd = $(this).find('.cmd').getValues('.cmdAttr')
-      if ('function' == typeof (saveEqLogic)) {
-        //eqLogic = saveEqLogic(eqLogic)
-      }
-      //eqLogics.push(eqLogic)
-    }
-  }) 
-  */
-  
-  
-  
-  
-  
-  //widgets.test = $('#div_templateTest .test').getValues('.testAttr')
-  //widgets.id = ""
-      downloadObjectAsJson(eqLogic, "export")
-  return false
+var tousObj = [];
+	jeedom.eqLogic.byId({
+			"id": $('.eqLogicAttr[data-l1key=id]')[0].value,
+			noCache: true,
+			success: function (obj) {tousObj.push(obj);}
+		});
+	
+var idDesCommandes= $("#toutDevice").getValues('.cmdAttr')[0].id;
+	for (var i in idDesCommandes) { // on boucle sur toutes les commandes
+		jeedom.cmd.byId({
+				"id": idDesCommandes[i],
+				noCache: true,
+				success: function (obj) {tousObj.push(obj);}
+			});	  
+	}
+setTimeout(() => {downloadObjectAsJson(tousObj, $('.eqLogicAttr[data-l1key=name]')[0].value)}, 1000);
+  //return false
+
+
+/*
+var data = [];
+data[0] = { "ID": "1", "Status": "Valid" };
+data[1] = { "ID": "2", "Status": "Invalid" };
+data[2] = { "ID": "3", "Status": "jhg" };
+data[3] = { "ID": "4", "Status": "eeeeeeee" };
+console.log("----------------------------------data");
+console.log(data)
+console.log(JSON.stringify(data))
+*/
+
+/*
+var tempData = [];
+
+       tempData.push( data );
+
+data = tempData;
+//console.log(data)
+console.log(JSON.stringify(data))
+
+var tempData = [];
+   tempData.push( tousObj );
+console.log(JSON.stringify(tempData))
+
+
+console.log("----------------------------------commandes");
+
+console.log(tousObj)
+console.log(JSON.stringify(tousObj))	
+*/
+//console.log(JSON.stringify(Object.assign({}, tousObj)))
+//downloadObjectAsJson(tousObj, "exportName")
+
+// [] array
+// {} object
+	
+            //$('#123').attr('logicalId', obj.logicalId);
+
+	/*var infoequipement= $("#TabInfo2").getValues('.eqLogicAttr')[0];
+	console.log("----------------------------------infoequipement.configuration");
+	console.dir(infoequipement.configuration);
+	
+	var equipement= $("#toutDevice").getValues('.eqLogicAttr')[0];
+	var equipementconfiguration=equipement.configuration
+	delete equipementconfiguration.dernierLancement
+	delete equipementconfiguration.type
+	
+	//console.dir(equipement);
+	//console.log("----------------------------------equipement");
+	//console.dir(equipement);
+	//console.log("----------------------------------equipementconfiguration");
+	//console.dir(equipementconfiguration);
+	var exportName=equipement.name
+	delete equipement.id
+	delete equipement.object_id
+	delete equipement.category
+	delete equipement.isEnable
+	delete equipement.isVisible
+	var commandes= $("#toutDevice").getValues('.cmdAttr')[0];
+	//console.log("----------------------------------commandes");
+	//console.dir(commandes);
+	delete commandes.id
+	delete commandes.isVisible
+	delete commandes.configuration.request
+  //downloadObjectAsJson(commandes, equipement.name)
+  //var exportObj=$.extend(equipement, commandes)
+  //var exportObj=commandes
+  var exportObj = Object.assign({}, commandes, equipementconfiguration);
+	//console.log("----------------------------------exportObj");
+	//console.dir(exportObj);
+ // downloadObjectAsJson(exportObj, exportName)
+  return false*/
 }) 
+
+
 
 function downloadObjectAsJson(exportObj, exportName) {
   var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObj))
@@ -117,51 +257,6 @@ $("#table_cmd").sortable({axis: "y", cursor: "move", items: ".cmd", placeholder:
  * Fonction permettant l'affichage des commandes dans l'équipement, import des fonctionnalités de virtual
  */
 
-$('#bt_importTemplate').off('click').on('click', function () {
-  $.ajax({
-    type: "POST",
-    url: "plugins/virtual/core/ajax/virtual.ajax.php",
-    data: {
-      action: "getTemplateList",
-    },
-    dataType: 'json',
-    error: function (request, status, error) {
-      handleAjaxError(request, status, error);
-    },
-    success: function (data) {
-      var inputOptions = [];
-      for(var i in data.result){
-        inputOptions.push({
-          text : data.result[i].name,
-          value : i
-        })
-      }
-      bootbox.prompt({
-        title: "Quel template ?",
-        inputType: 'select',
-        inputOptions: inputOptions,
-        callback: function (result) {
-          $.ajax({
-            type: "POST",
-            url: "plugins/virtual/core/ajax/virtual.ajax.php",
-            data: {
-              action: "applyTemplate",
-              id: $('.eqLogicAttr[data-l1key=id]').value(),
-              name : result
-            },
-            dataType: 'json',
-            error: function (request, status, error) {
-              handleAjaxError(request, status, error);
-            },
-            success: function (data) {
-              $('.eqLogicDisplayCard[data-eqLogic_id='+$('.eqLogicAttr[data-l1key=id]').value()+']').click();
-            }
-          });
-        }
-      });
-    }
-  });
-});
 
 $('#bt_importEqLogic').off('click').on('click', function () {
   jeedom.eqLogic.getSelectModal({}, function (result) {
@@ -257,10 +352,6 @@ function printEqLogic(_eqLogic) {
 //typefield vaut : syno ou cmd ou cmdinfo
 
 if ($('#typefield').value() == 'syno') {// ne plus toucher ok
-//	$('#Onglet_groupeCommandes').hide();
-   // $('#OngletInfo').show();
-  //  $('#OngletCmd').hide();
-	
 	document.getElementById("OngletInfo").className = "active";
 	document.getElementById("TabInfo").className = "tab-pane active";
 	
@@ -269,13 +360,8 @@ if ($('#typefield').value() == 'syno') {// ne plus toucher ok
 	
 	document.getElementById("OngletCmd").className = "hidden";
 	document.getElementById("TabCmd").className = "hidden";
-	
-//	$('#groupeCommandes').hide();
- //   $('#eqlogictab').show();
-   // $('#eqlogictab2').show();
 }
 if ($('#typefield').value() == 'cmd') { // ne plus toucher ok
-    //$('#OngletInfo').hide();
 	document.getElementById("OngletInfo").className = "active";
 	document.getElementById("TabInfo").className = "tab-pane active";
 	
@@ -284,14 +370,8 @@ if ($('#typefield').value() == 'cmd') { // ne plus toucher ok
 	
 	document.getElementById("OngletCmd").className = "";
 	document.getElementById("TabCmd").className = "tab-pane";
-   // $('#Onglet_eqlogictab2').hide();
-//	$('#OngletCmd').show();
-  //  $('#eqlogictab').hide();
-    //$('#eqlogictab2').hide();
-	//$('#groupeCommandes').show();
 }
 if ($('#typefield').value() == 'cmdinfo') { // ne plus toucher ok
- //   $('#OngletInfo').show();
 	document.getElementById("OngletInfo").className = "active";
 	document.getElementById("TabInfo").className = "tab-pane active";
 	
@@ -300,65 +380,16 @@ if ($('#typefield').value() == 'cmdinfo') { // ne plus toucher ok
 	
 	document.getElementById("OngletCmd").className = "";
 	document.getElementById("TabCmd").className = "tab-pane";
- //   $('#OngletCmd').show();
-//	$('#Onglet_groupeCommandes').show();
-  //  $('#eqlogictab').show();
-    //$('#eqlogictab2').hide();
-	//$('#groupeCommandes').show();
 }
- /*
-    $('#OngletCommandes').hide();
-    $('#OngletGroupeCmd').hide();
-    $('#EcranGroupeCmd').hide();
-    $('#EcranEquipement').hide();
-    $('#OngletEquipement').hide();
-    $('#EcranListeAPI').hide();
-    $('#OngletListeAPI').hide();
-
-if ($('#typefield').value() == 'all') {
-	$('#EcranListeAPI').show();
-	$('#OngletListeAPI').show();
-}
-else if ($('#typefield').value() == 'cmdinfo') {
-	$('#OngletGroupeCmd').show();
-	$('#EcranGroupeCmd').show();
-	$('#OngletCommandes').show();
-	$('#OngletEquipement').show();
-	$('#EcranEquipement').show();
-}
-else if ($('#typefield').value() == 'cmd') {
-	$('#OngletGroupeCmd').show();
-	$('#EcranGroupeCmd').show();
-}else { //les requetes infos
-	$('#OngletCommandes').show();
-	$('#OngletEquipement').show();
-	$('#EcranEquipement').show();
-}
-  
- 
-titreCmd=' <tr><th style="width: 410px;">{{  Nom personnalisable}}</th><th style="width: 130px;">{{Type}}</th><th style="width: 400px;">{{Champs API}}</th><th style="width: 280px;">{{Options}}</th>';
-$essai="coiucou";
-
-
-$('#table_cmdTitre').empty();
-if (_eqLogic.configuration.type == "")  //vaut cmd quand c'ets une commande
-	$('#table_cmdTitre').append(titreCmd);
-else 
-	$('#table_cmdTitre').append(titreRequete);
-	
-	$('#table_cmdTitre2').append(titreCmd);
-	$('#table_cmdTitre').append(titreRequete);*/
 titreCmd=' <tr><th style="width: 410px;">{{  Nom de la commande}}</th><th style="width: 400px;">{{Commentaire ou explication (facultatif)}}</th><th >{{Commande à envoyer}}</th><th style="width: 240px;">{{Options}}</th>';
-	
 $('#table_cmdTitre2').empty();
 	$('#table_cmdTitre2').append(titreCmd);
-	
 }
 
 function addCmdToTable(_cmd) {
 	
 	//console.log("coucou");
-	//console.dir(_cmd);
+//	console.dir(_cmd);
 	// 400 (name) + 130 (info) + 400 (requete) + 200 + 90
 	
 	    DefinitionDivPourCommandesPredefinies = 'style="display: none;"';
@@ -384,10 +415,14 @@ function addCmdToTable(_cmd) {
     tr += '<td>';
     //tr += '<input style="margin-bottom : 30px;" class="cmdAttr form-control type input-sm" data-l1key="type" value="action" disabled />';
 	
-	tr += '<input type="hidden" class="cmdAttr form-control type input-sm" data-l1key="type" value="action" />';
-	tr += '<input type="hidden" class="cmdAttr form-control type input-sm" data-l1key="subType"/>';
-	tr += '<input type="hidden" class="cmdAttr form-control type input-sm" data-l1key="configuration" data-l2key="requestAPI" value="rrrrien"/>';
-
+//	tr += '<input type="hidden" class="cmdAttr form-control type input-sm" data-l1key="type" value="action" />';
+//	tr += '<input type="hidden" class="cmdAttr form-control type input-sm" data-l1key="subType"/>';
+//	tr += '<input type="hidden" class="cmdAttr form-control type input-sm" data-l1key="configuration" data-l2key="requestAPI" value="refresh"/>';
+//	tr += '<input type="hidden" class="cmdAttr form-control type input-sm" data-l1key="logicalId"/>';
+//	tr += '<input type="hidden" class="cmdAttr form-control type input-sm" data-l1key="template" data-l2key="dashboard"/>';
+//	tr += '<input type="hidden" class="cmdAttr form-control type input-sm" data-l1key="template" data-l2key="mobile"/>';
+//	tr += '<input type="hidden" class="cmdAttr form-control type input-sm" data-l1key="display" data-l2key="showNameOndashboard"/>';
+//	tr += '<input type="hidden" class="cmdAttr form-control type input-sm" data-l1key="display" data-l2key="showNameOnmobile"/>';
 	
 	
 	
@@ -455,12 +490,17 @@ function addCmdToTable(_cmd) {
  //     tr += ' style="display:none;" ';
 	  
     tr += ' data-l1key="configuration" data-l2key="requestAPI">';
+	tr += '<input type="hidden" class="cmdAttr form-control type input-sm" data-l1key="logicalId"/>';
+//	tr += '<input type="hidden" class="cmdAttr form-control type input-sm" data-l1key="template" data-l2key="dashboard"/>';
+//	tr += '<input type="hidden" class="cmdAttr form-control type input-sm" data-l1key="template" data-l2key="mobile"/>';
+//	tr += '<input type="hidden" class="cmdAttr form-control type input-sm" data-l1key="display" data-l2key="showNameOndashboard"/>';
+//	tr += '<input type="hidden" class="cmdAttr form-control type input-sm" data-l1key="display" data-l2key="showNameOnmobile"/>';
     tr += '<input  class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="calcul" placeholder="{{Calcul facultatif, utiliser #value# pour utiliser la valeur récupérée}}">';
     tr += '<td width=190>';
     tr += '<input class="tooltips cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="minValue" placeholder="{{Min}}" title="{{Min}}" style="width:30%;display:inline-block;">';
     tr += '<input class="tooltips cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="maxValue" placeholder="{{Max}}" title="{{Max}}" style="width:30%;display:inline-block;">';
     tr += '<input class="cmdAttr form-control input-sm" data-l1key="unite" placeholder="Unité" title="{{Unité}}" style="width:50px;display:inline-block;margin-right:5px;">';
-    tr += '<input class="tooltips cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="listValue" placeholder="{{Liste de valeur|texte séparé par ;}}" title="{{Liste}}">';
+   // tr += '<input class="tooltips cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="listValue" placeholder="{{Liste de valeur|texte séparé par ;}}" title="{{Liste}}">';
     tr += '<span><label class="checkbox-inline"><input type="checkbox" class="cmdAttr checkbox-inline" data-l1key="isVisible" checked/>{{Afficher}}</label></span> ';
     tr += '<span><label class="checkbox-inline"><input type="checkbox" class="cmdAttr checkbox-inline" data-l1key="isHistorized" checked/>{{Historiser}}</label></span> ';
     tr += '<span><label class="checkbox-inline"><input type="checkbox" class="cmdAttr" data-l1key="display" data-l2key="invertBinary"/>{{Inverser}}</label></span> ';
@@ -553,13 +593,16 @@ function addCmdToTable(_cmd) {
     tr += '<div ' + DefinitionDivPourCommandesPredefinies + '>';
     tr += '<span class="subType" subType="' + init(_cmd.subType) + '"></span>';
     tr += '</div></td>';*/
-    tr += '<td><input class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="request">';
+    tr += '<td><input class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="requestAPI">';
 	
-	tr += '<input type="hidden" class="cmdAttr form-control type input-sm" data-l1key="type" value="action" />';
-	tr += '<input type="hidden" class="cmdAttr form-control type input-sm" data-l1key="subType"/>';
-	tr += '<input type="hidden" class="cmdAttr form-control type input-sm" data-l1key="configuration" data-l2key="requestAPI" value="rien"/>';
-
-	
+//	tr += '<input type="hidden" class="cmdAttr form-control type input-sm" data-l1key="type" value="action" />';
+//	tr += '<input type="hidden" class="cmdAttr form-control type input-sm" data-l1key="subType"/>';
+//	tr += '<input type="hidden" class="cmdAttr form-control type input-sm" data-l1key="logicalId"/>';
+	//tr += '<input type="hidden" class="cmdAttr form-control type input-sm" data-l1key="configuration" data-l2key="requestAPI"/>';
+//	tr += '<input type="hidden" class="cmdAttr form-control type input-sm" data-l1key="template" data-l2key="dashboard"/>';
+//	tr += '<input type="hidden" class="cmdAttr form-control type input-sm" data-l1key="template" data-l2key="mobile"/>';
+//	tr += '<input type="hidden" class="cmdAttr form-control type input-sm" data-l1key="display" data-l2key="showNameOndashboard"/>';
+//	tr += '<input type="hidden" class="cmdAttr form-control type input-sm" data-l1key="display" data-l2key="showNameOnmobile"/>';	
 
 
     tr +=   '</td><td width=90><label class="checkbox-inline"><input type="checkbox" class="cmdAttr checkbox-inline" data-l1key="isVisible" checked/>{{Afficher}}</label>' +

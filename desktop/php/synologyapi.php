@@ -5,7 +5,7 @@
 	$plugin = plugin::byId('synologyapi');
 	sendVarToJS('eqType', $plugin->getId());
 	$eqLogics = eqLogic::byType($plugin->getId());
-	
+	 
 	function afficheIcones($plugin, $eqLogics, $idSyno) {
 		foreach ($eqLogics as $eqLogic) {
 			// On recompte le nb de commandes pour actualiser les compteurs Info et Cmd
@@ -83,6 +83,8 @@
 	<!-- -------------- Premier SYNO ---------------->  
 	<input class="form-control" placeholder="{{Rechercher}}" id="in_searchEqlogic" />
 	<legend ><i class="fas fa-cogs"></i> {{API de <?php echo config::byKey('Syno1_name','synologyapi')?>}}</legend>
+			<span class="btn btn-secondary btn-sm btn-file"><i class="fas fa-file-import"></i><span class="hidden-xs">{{ Importer un Modèle}}</span><input  id="bt_importSYNODevice1" type="file" name="file" style="display:inline-block;">
+			</span>
 		<div class="eqLogicThumbnailContainer">
 		<?php
 		afficheIcones($plugin,$eqLogics, "1");
@@ -93,6 +95,8 @@
 	if (config::byKey('Syno2_name','synologyapi')!="") {
 		?>
 		<legend ><i class="fas fa-cogs"></i> {{API de <?php echo config::byKey('Syno2_name','synologyapi')?>}}</legend>
+		<span class="btn btn-secondary btn-sm btn-file"><i class="fas fa-file-import"></i><span class="hidden-xs">{{ Importer un Modèle}}</span><input  id="bt_importSYNODevice2" type="file" name="file" style="display:inline-block;">
+			</span>
 		<div class="eqLogicThumbnailContainer">
 		<?php
 		afficheIcones($plugin,$eqLogics, "2");
@@ -104,6 +108,8 @@
 	if (config::byKey('Syno3_name','synologyapi')!="") {
 		?>
 		<legend ><i class="fas fa-cogs"></i> {{API de <?php echo config::byKey('Syno3_name','synologyapi')?>}}</legend>
+		<span class="btn btn-secondary btn-sm btn-file"><i class="fas fa-file-import"></i><span class="hidden-xs">{{ Importer un Modèle}}</span><input  id="bt_importSYNODevice3" type="file" name="file" style="display:inline-block;">
+			</span>
 		<div class="eqLogicThumbnailContainer">
 		<?php
 		afficheIcones($plugin,$eqLogics, "3");
@@ -116,17 +122,16 @@
 		<div class="input-group pull-right" style="display:inline-flex">
 			<span class="input-group-btn">
 			<a class="btn btn-default btn-sm eqLogicAction roundedLeft" data-action="configure"><i class="fa fa-cogs"></i> {{Configuration avancée}}</a>
-			<span class="btn btn-info btn-sm btn-file"><i class="fas fa-file-import"></i><span class="hidden-xs">{{Importer}}</span><input  id="bt_importSYNODevice" type="file" name="file" style="display:inline-block;">
-      </span><a class="btn btn-info btn-sm" id="bt_exportSYNODevice"><i class="fas fa-file-export"></i> <span class="hidden-xs">{{Exporter}}</span>
+			<a class="btn btn-info btn-sm" id="bt_exportSYNODevice"><i class="fas fa-file-export"></i> <span class="hidden-xs">{{Exporter}}</span>
 			<a class="btn btn-sm btn-success eqLogicAction" data-action="save"><i class="fas fa-check-circle"></i> {{Sauvegarder}}</a><a class="btn btn-danger btn-sm eqLogicAction roundedRight" data-action="remove"><i class="fas fa-minus-circle"></i> {{Supprimer}}</a>
 			</span>
 		</div>
 		<span style="position:relative;top:+5px;left:+5px;visibility:collapse;" class="eqLogicAttr" data-l1key="configuration" id="typefield" data-l2key="type"> </span>
 		<ul class="nav nav-tabs" role="tablist">
 			<li role="presentation"><a href="#" class="eqLogicAction" aria-controls="home" role="tab" data-toggle="tab" data-action="returnToThumbnailDisplay"><i class="fa fa-arrow-circle-left"></i></a></li>
-			<li id="OngletInfo" role="presentation"><a href="#TabInfo" aria-controls="home" role="tab" data-toggle="tab"><i class="fas fa-tachometer-alt"></i> {{Equipement}}</a></li>
-			<li id="OngletInfo2" role="presentation" ><a href="#TabInfo2" aria-controls="home" role="tab" data-toggle="tab"><i class="fas fa-download"></i> {{Informations à récupérer}} (<span class="eqLogicAttr" data-l1key="configuration" data-l2key="compteurinfo"></span>)</a></li>
-			<li id="OngletCmd" role="presentation"><a href="#TabCmd" aria-controls="home" role="tab" data-toggle="tab"><i class="fas fa-upload"></i> {{Commandes à envoyer}} (<span class="eqLogicAttr" data-l1key="configuration" data-l2key="compteurcmd"></span>)</a></li>
+			<li id="OngletInfo"  role="presentation"><a href="#TabInfo"  aria-controls="home" role="tab" data-toggle="tab"><i class="fas fa-tachometer-alt"></i> {{Equipement}}</a></li>
+			<li id="OngletInfo2" role="presentation"><a href="#TabInfo2" aria-controls="home" role="tab" data-toggle="tab"><i class="fas fa-download"></i> {{Informations à récupérer}} (<span class="eqLogicAttr" data-l1key="configuration" data-l2key="compteurinfo"></span>)</a></li>
+			<li id="OngletCmd"   role="presentation"><a href="#TabCmd"   aria-controls="home" role="tab" data-toggle="tab"><i class="fas fa-upload"></i> {{Commandes à envoyer}} (<span class="eqLogicAttr" data-l1key="configuration" data-l2key="compteurcmd"></span>)</a></li>
 		</ul>
 		<!---------------- Onglet ListeAPI --------------  
 		<div id="EcranListeAPI" class="tab-content" style="height:calc(100% - 50px);overflow:auto;overflow-x: hidden;">
@@ -148,12 +153,6 @@
 		<div class="tab-content">
 		<!---------------- Onglet Equipement ---------------->  
 			<div role="tabpanel" class="tab-pane " id="TabInfo">
-		
-			
-
-			
-			
-			
 				<form class="form-horizontal">
 					<fieldset><br><br>
 						<div class="form-group">

@@ -60,6 +60,16 @@ class synologyapi extends eqLogic {
                     'operation' => "#value#==\"outOfDate\"",
                     'state_light' => "<i class=\"fas fa-exclamation-circle icon_orange\"></i>",
                     'state_dark' => "<i class=\"fas fa-exclamation-circle icon_orange\"></i>"
+                ),
+                array(
+                    'operation' => "#value#==\"warning\"",
+                    'state_light' => "<i class=\"fas fa-exclamation-circle icon_orange\"></i>",
+                    'state_dark' => "<i class=\"fas fa-exclamation-circle icon_orange\"></i>"
+                ),
+                array(
+                    'operation' => "#value#==\"info\"",
+                    'state_light' => "<i class=\"fas fa-exclamation-circle icon_blue\"></i>",
+                    'state_dark' => "<i class=\"fas fa-exclamation-circle icon_blue\"></i>"
                 )
             )
         );
@@ -142,6 +152,94 @@ class synologyapi extends eqLogic {
 
 
     /*     * *********************Méthodes d'instance************************* */
+ 
+
+public static function importerJson($id, $idSyno, $objectData) {
+	//$CommentaireaAfficheralaFin="";
+	$eqLogic = eqLogic::byId($id);
+	log::add('synologyapi', 'info', "---------------------[Importation dans le nouveau device Jeedom : ".$eqLogic->getName()."]------------------------------");
+	$arrayData=json_decode(json_encode(json_decode($objectData)), true);
+	foreach ($arrayData as $Device) { 
+		if (isset($Device['eqLogic_id'])) {
+			if ($Device['logicalId']!="refresh") {
+			// --- C'est une commande cmd ---
+			log::add('synologyapi', 'info', " [Cmd] Importation de la commande ".$Device['name']." : ".json_encode($Device, true));
+			$cmd = new synologyapiCmd();
+			$cmd->setEqLogic_id($eqLogic->getId());
+			$cmd->enregistrementDansCmd($eqLogic, "racine", $Device, 0);
+			$cmd->save();
+			}
+		} else {
+			// --- C'est une device edLogic ---
+			log::add('synologyapi', 'info', " [EqL] Importation du device : ".json_encode($Device, true));
+			//$CommentaireaAfficheralaFin=$Device['comment'];
+			self::EnregistrementDansDevice($eqLogic, "", $Device);
+		}
+	}
+	$eqLogic->setConfiguration('devicetype', $idSyno);
+	$eqLogic->save();
+	//if ($CommentaireaAfficheralaFin!="") message::add('synologyapi', "Importation réussie, message de l'auteur du Template : ".$CommentaireaAfficheralaFin); else message::add('synologyapi', "Importation réussie");
+}
+
+
+public static function EnregistrementDansDevice($eqLogic, $categorie, $Device) {
+	foreach ($Device as $idEnregistrementDansDevice => $enregistrementDansDevice) { 
+		if (!is_array($enregistrementDansDevice)) {
+				//log::add('synologyapi', 'info', " DeviceARepartir ".$idEnregistrementDansDevice." : ".$enregistrementDansDevice);
+			switch ($categorie) {
+			case "" :
+				switch ($idEnregistrementDansDevice) {
+								case "logicalId":
+									$eqLogic->setLogicalId($enregistrementDansDevice);
+									break;
+								case "eqType_name":
+									$eqLogic->setEqType_name($enregistrementDansDevice);
+									break;								
+								case "isVisible":
+									$eqLogic->setIsVisible($enregistrementDansDevice);
+									break;
+								case "isEnable":
+									$eqLogic->setIsEnable($enregistrementDansDevice);
+									break;								
+								case "generic_type":
+									$eqLogic->setGenericType($enregistrementDansDevice);
+									break;								
+								case "order":
+									$eqLogic->setOrder($enregistrementDansDevice);
+									break;								
+								case "comment":
+									$eqLogic->setComment($enregistrementDansDevice);
+									break;								
+								case "tags":
+									$eqLogic->setTags($enregistrementDansDevice);
+									break;				
+								default:
+									log::add('synologyapi', 'debug', "[EqL] Ignoré ex-".$idEnregistrementDansDevice.":".$enregistrementDansDevice);
+									break;				
+								}
+			break;
+			case "configuration":
+				$eqLogic->setConfiguration($idEnregistrementDansDevice,$enregistrementDansDevice); 			
+				break;
+			case "category":
+				$eqLogic->setCategory($idEnregistrementDansDevice,$enregistrementDansDevice); 			
+				break;
+			case "display":
+				$eqLogic->setDisplay($idEnregistrementDansDevice,$enregistrementDansDevice); 			
+				break;
+			case "status":
+				$eqLogic->setStatus($idEnregistrementDansDevice,$enregistrementDansDevice); 			
+				break;
+			default:
+				log::add('synologyapi', 'debug', "[EqL] Catégorie ignorée [".$categorie."] ".$idEnregistrementDansDevice.":".$enregistrementDansDevice);
+				break;	
+			}
+		} else {
+				self::EnregistrementDansDevice($eqLogic, $idEnregistrementDansDevice, $enregistrementDansDevice);
+		}
+	}	
+}
+		
 
 //Ajouté par l'installateur, c'est un cron exécuté toutes les minutes
 public static function update() {
@@ -566,6 +664,15 @@ $arrContextOptions=array(
 				}
 				$this->setConfiguration('compteurcmd', $compteurcmd);					
 */
+						//log::add('synologyapi', 'debug', '******************requestAPI: '.$this->getConfiguration('requestAPI'));
+						//log::add('synologyapi', 'debug', '******************request: '.$this->getConfiguration('request'));
+
+// Pourra être supprimé dans quelques temps, pour l'instant, pour ne pas perdre les informations stockées dans configuration/request qui passent dans configuration/requestAPI
+if (($this->getConfiguration('requestAPI') == "")     && ($this->getConfiguration('request') != "")) $this->setConfiguration('requestAPI', $this->getConfiguration('request'));
+if (($this->getConfiguration('requestAPI') == "rien") && ($this->getConfiguration('request') != "")) $this->setConfiguration('requestAPI', $this->getConfiguration('request'));
+
+//----------------
+
 	}
 
  // Fonction exécutée automatiquement après la sauvegarde (création ou mise à jour) de l'équipement 
@@ -590,7 +697,6 @@ $arrContextOptions=array(
 				$this->save();
 				}	
 				*/
-
 
 					
 			if ($this->getConfiguration('type') != "cmd") {
@@ -665,6 +771,95 @@ class synologyapiCmd extends cmd {
       }
      */
 
+public function enregistrementDansCmd($eqLogic, $categorie, $Device, $Niveau) {
+	if ($Niveau<2) {
+		//log::add('synologyapi', 'info', $Niveau." Lance enregistrementDansCmd Categorie: ".$categorie." / Device : ".json_encode($Device, true));
+		foreach ($Device as $idEnregistrementDansDevice => $enregistrementDansDevice) { 
+			if (!is_array($enregistrementDansDevice)) {
+				//log::add('synologyapi', 'debug', " CmdARepartir ".$idEnregistrementDansDevice." : ".$enregistrementDansDevice);
+				switch ($categorie) {
+				case "racine" :				
+					switch ($idEnregistrementDansDevice) {
+									case "logicalId":
+										$this->setLogicalId($enregistrementDansDevice);
+										break;
+									case "name":
+										$this->setName($enregistrementDansDevice);
+										break;
+									case "eqType":
+										$this->setEqType($enregistrementDansDevice);
+										break;								
+									case "isVisible":
+										$this->setIsVisible($enregistrementDansDevice);
+										break;
+									case "isHistorized":
+										$this->setIsHistorized($enregistrementDansDevice);
+										break;	
+									case "unite":
+										$this->setUnite($enregistrementDansDevice);
+										break;
+									case "type":
+										$this->setType($enregistrementDansDevice);
+										break;
+									case "subType":
+										$this->setSubType($enregistrementDansDevice);
+										break;
+									case "generic_type":
+										$this->setGeneric_type($enregistrementDansDevice);
+										break;								
+									case "order":
+										$this->setOrder($enregistrementDansDevice);
+										break;								
+									case "comment":
+										$this->setComment($enregistrementDansDevice);
+										break;								
+									case "tags":
+										$this->setTags($enregistrementDansDevice);
+										break;				
+									}
+					break;
+				case "configuration":
+					$this->setConfiguration($idEnregistrementDansDevice,$enregistrementDansDevice); 
+					break;
+				case "display":
+					$this->setDisplay($idEnregistrementDansDevice,$enregistrementDansDevice); 	
+					break;
+				case "category":
+					$this->setCategory($idEnregistrementDansDevice,$enregistrementDansDevice); 
+					break;
+				case "status":
+					$this->setStatus($idEnregistrementDansDevice,$enregistrementDansDevice); 
+					break;
+				case "template":
+					$this->setTemplate($idEnregistrementDansDevice,$enregistrementDansDevice); 
+					break;
+				case "parameters":
+					$this->setParameters($idEnregistrementDansDevice,$enregistrementDansDevice); 
+					break;
+				case "alert":
+					$this->setAlert($idEnregistrementDansDevice,$enregistrementDansDevice); 
+					break;
+				case "options":
+					$this->setOptions($idEnregistrementDansDevice,$enregistrementDansDevice); 
+					break;
+				default:
+					log::add('synologyapi', 'debug', "[Cmd] Catégorie ignorée :".$categorie);
+					break;					
+				}
+		
+			} else {
+					//log::add('synologyapi', 'info', " CmdARepartir --------------------> ".$idEnregistrementDansDevice." : ".$enregistrementDansDevice);
+					$this->enregistrementDansCmd($eqLogic, $idEnregistrementDansDevice, $enregistrementDansDevice, $Niveau+1);
+			}
+		}
+	} else {
+	log::add('synologyapi', 'debug', "[Cmd] Niveau ".$Niveau." volontairement ignoré à partir de [".$categorie."]");
+	}		
+return $this;	
+}
+
+
+
   // Exécution d'une commande  
  public function execute($_options = array()) {
 	 
@@ -688,12 +883,28 @@ class synologyapiCmd extends cmd {
 	$idsynology=$this->getEqLogic()->getConfiguration('devicetype');
 	$sid=synologyapi::vaChercherSID($idsynology);
 	$parameters="";
-	$parametresAPI="?".str_replace("api=", "api=SYNO.", $this->getConfiguration('request'));
+	$parametresAPI="?".str_replace("api=", "api=SYNO.", $this->getConfiguration('requestAPI'));
 	$obj_Data=synologyapi::recupereDonneesJson ($sid, $parametresAPI, $parameters, $idsynology);
 	log::add('synologyapi', 'debug', '╠═ Résultat: '.json_encode($obj_Data));		
 		log::add('synologyapi', 'info', ' ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════');
 
        }
+
+ // Fonction exécutée automatiquement avant la sauvegarde (création ou mise à jour) de la commande 
+    public function preSave() {
+
+// Pourra être supprimé dans quelques temps, pour l'instant, pour ne pas perdre les informations stockées dans configuration/request qui passent dans configuration/requestAPI
+if (($this->getConfiguration('requestAPI') == "")     && ($this->getConfiguration('request') != "")) $this->setConfiguration('requestAPI', $this->getConfiguration('request'));
+if (($this->getConfiguration('requestAPI') == "rien") && ($this->getConfiguration('request') != "")) $this->setConfiguration('requestAPI', $this->getConfiguration('request'));
+
+//----------------
+
+	}
+
+
+
+
+
 
     /*     * **********************Getteur Setteur*************************** */
 }
