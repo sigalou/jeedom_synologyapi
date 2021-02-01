@@ -1,7 +1,7 @@
 {
 	"id" : "synologyapi",
 	"name" : "Synology API",
-	"description" : "Interface avec les NAS ou Routeurs Synology",
+	"description" : "Pour dialoguer avec les NAS ou Routeurs Synology. Envoyer des ordres à vos Synology ou récupérer l'état du wifi, des connexions, des disques, ...",
 	"licence" : "AGPL",
 	"author" : "Sigalou",
 	"require" : "3.2",
