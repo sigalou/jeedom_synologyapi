@@ -88,9 +88,15 @@ class synologyapi extends eqLogic {
                     'state_dark' => "<i class='icon jeedomapp-lock-ferme icon_red'></i>"
                 )
             )
-        );        return $return;
+        );        
+		
+		$return['info']['binary']['TrueFalse'] = array(
+            'template' => 'tmplicon',
+            'replace' => array("#_icon_on_#" => "<i class='fas fa-thumbs-up icon_green'></i>","#_icon_off_#" => "<i class='fas fa-thumbs-down icon_red'></i>")); 
+		
+		
+		return $return;
     }
-
 
 
 
